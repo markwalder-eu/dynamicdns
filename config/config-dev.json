@@ -1,9 +1,9 @@
 {
 	"home.dev.markwalder.eu": {
-		"aws_region": "us-east-1",
-		"route_53_zone_id": "ZKVBGSUEZRK4M",
+		"aws_region": "",
+		"route_53_zone_id": "",
 		"route_53_record_ttl": 300,
 		"route_53_record_type": "A",
-		"shared_secret": "k7NvexFwUBGPGoiBzc3MlPDz96o7jtjk"
+		"shared_secret": ""
 	}
 }
