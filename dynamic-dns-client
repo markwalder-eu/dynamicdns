@@ -1,0 +1,95 @@
+#!/bin/bash
+
+usage() {
+    echo "usage: client -u <url> -h <hostname> -s <shared secret> [-i <internalip>]"
+    exit
+}
+
+type head   >/dev/null 2>&1 || { echo >&2 "I require 'head' but it's not installed. Aborting."; exit 1; }
+type tail   >/dev/null 2>&1 || { echo >&2 "I require 'tail' but it's not installed. Aborting."; exit 1; }
+type awk    >/dev/null 2>&1 || { echo >&2 "I require 'awk' but it's not installed. Aborting."; exit 1; }
+type shasum >/dev/null 2>&1 || { echo >&2 "I require 'shasum' but it's not installed. Aborting."; exit 1; }
+type curl   >/dev/null 2>&1 || { echo >&2 "I require 'curl' but it's not installed. Aborting."; exit 1; }
+
+while [ "$1" != "" ]; do
+    case $1 in
+        -u | --url )            shift
+                                url=$1
+                                ;;
+        -h | --hostname )       shift
+                                hostname=$1
+                                ;;
+        -s | --secret )         shift
+                                sharedsecret=$1
+                                ;;
+        -i | --internalip )     shift
+                                internalip=$1
+                                ;;
+        -h | --help )           usage
+                                ;;
+        * )                     usage
+                                ;;
+    esac
+    shift
+done
+
+[ -z $url ] && usage
+[ -z $hostname ] && usage
+[ -z $sharedsecret ] && usage
+
+if [ "$internalip" != "" ]; then
+    internalip="internalip=$internalip&"
+fi
+
+if [ "${url: -1}" == "/" ]; then
+    url="${url:0:-1}"
+fi
+
+sourceip_url="dynamicdns-v1/local"
+remoteip_url="dynamicdns-v1/remote"
+
+# -----------------------------------------------------------------------------
+# Header
+
+echo "$(date) - Dynamic DNS Update Utility"
+
+
+# -----------------------------------------------------------------------------
+# Source IP
+
+response=$(curl -w \\n%{http_code} -s -q "$url/$sourceip_url?raw")
+
+http_status=$(echo "$response" | tail -n1)
+tmp=$(echo "$response" | head -n-1)
+fn_status=$(echo "$tmp" | head -n1)
+fn_message=$(echo "$tmp" | tail -n1)
+
+echo "- Get Source IP <-- $fn_message"
+if [ $http_status != 200 ] || [ "$fn_status" != "SUCCESS" ]; then
+    exit 1
+fi
+
+
+# -----------------------------------------------------------------------------
+# Remote IP
+
+sourceip=$fn_message
+hash=$(echo -n $sourceip$hostname$sharedsecret | shasum -a 256 | awk '{print $1}')
+
+response=$(curl -w \\n%{http_code} -X POST -s -q "$url/$remoteip_url?raw&hostname=$hostname&${internalip}hash=$hash")
+
+http_status=$(echo "$response" | tail -n1)
+tmp=$(echo "$response" | head -n-1)
+fn_status=$(echo "$tmp" | head -n1)
+fn_message=$(echo "$tmp" | tail -n1)
+
+echo "- Set Remote IP <-- $fn_message"
+if [ $http_status != 200 ] || [ "$fn_status" != "SUCCESS" ]; then
+    exit 1
+fi
+
+
+# -----------------------------------------------------------------------------
+# Footer
+
+echo ""

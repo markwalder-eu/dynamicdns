@@ -1,0 +1,53 @@
+custom:
+  version: v1
+  stage: ${opt:stage, 'dev'}
+  config: ${file(config/serverless-${self:custom.stage}.yml)}
+  customDomain:
+    domainName: ${self:custom.config.domainName}
+    basePath: dynamicdns-${self:custom.version}
+    stage: ${self:custom.stage}
+    certificateName: ${self:custom.config.certificateName}
+    createRoute53Record: true
+
+service: dynamicdns-${self:custom.version}
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: ${self:custom.stage}
+  environment:
+    CONFIG_S3_REGION: ${self:custom.config.s3Region}
+    CONFIG_S3_BUCKET: ${self:custom.config.s3Bucket}
+    CONFIG_S3_KEY: ${self:custom.config.s3Key}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:*
+        - route53:*
+      Resource:
+        - "arn:aws:s3:::${self:custom.config.s3Bucket}/*"
+        - "arn:aws:route53:::hostedzone/*"
+
+functions:
+  info:
+    handler: handler.info
+    events:
+      - http:
+          path: info
+          method: get
+  local:
+    handler: handler.local
+    events:
+      - http:
+          path: local
+          method: get
+  remote:
+    handler: handler.remote
+    events:
+      - http:
+          path: remote
+          method: post
+
+plugins:
+  - serverless-domain-manager
+  - serverless-aws-alias
