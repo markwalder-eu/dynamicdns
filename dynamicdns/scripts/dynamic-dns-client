@@ -64,10 +64,11 @@ tmp=$(echo "$response" | head -n-1)
 fn_status=$(echo "$tmp" | head -n1)
 fn_message=$(echo "$tmp" | tail -n1)
 
-echo "- Get Source IP <-- $fn_message"
 if [ $http_status != 200 ] || [ "$fn_status" != "SUCCESS" ]; then
+    echo "- Get Source IP: FAILED  <-- $fn_message"
     exit 1
 fi
+echo "- Get Source IP: SUCCESS <-- $fn_message"
 
 
 # -----------------------------------------------------------------------------
@@ -83,10 +84,11 @@ tmp=$(echo "$response" | head -n-1)
 fn_status=$(echo "$tmp" | head -n1)
 fn_message=$(echo "$tmp" | tail -n1)
 
-echo "- Set Remote IP <-- $fn_message"
 if [ $http_status != 200 ] || [ "$fn_status" != "SUCCESS" ]; then
+    echo "- Set Remote IP: FAILED  <-- $fn_message"
     exit 1
 fi
+echo "- Set Remote IP: SUCCESS <-- $fn_message"
 
 
 # -----------------------------------------------------------------------------

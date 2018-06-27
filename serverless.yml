@@ -8,9 +8,17 @@ custom:
     stage: ${self:custom.stage}
     certificateName: ${self:custom.config.certificateName}
     createRoute53Record: true
+  pythonRequirements:
+    dockerizePip: non-linux
 
 service: dynamicdns-${self:custom.version}
 
+package:
+  exclude:
+    - ./**
+  include:
+    - dynamicdns/**
+    
 provider:
   name: aws
   runtime: python3.6
@@ -30,24 +38,25 @@ provider:
 
 functions:
   info:
-    handler: handler.info
+    handler: dynamicdns/aws/functions.info
     events:
       - http:
           path: info
           method: get
   local:
-    handler: handler.local
+    handler: dynamicdns/aws/functions.local
     events:
       - http:
           path: local
           method: get
   remote:
-    handler: handler.remote
+    handler: dynamicdns/aws/functions.remote
     events:
       - http:
           path: remote
           method: post
 
 plugins:
+  - serverless-python-requirements
   - serverless-domain-manager
   - serverless-aws-alias
