@@ -9,14 +9,14 @@ from dynamicdns.aws.s3config import S3ConfigProvider
 from dynamicdns.aws.route53 import Route53Provider
 
 
-def info(event, context):
+def info(event, context): # pragma: no cover
     config: ConfigProvider = S3ConfigProvider()
     config.load()
     dns: DNSProvider = Route53Provider(config)
     handler: Handler = Handler(dns)
     return AWSFunctions(config, dns, handler).info(event, context)
 
-def local(event, context):
+def local(event, context): # pragma: no cover
     config: ConfigProvider = S3ConfigProvider()
     config.load()
     dns: DNSProvider = Route53Provider(config)
@@ -24,7 +24,7 @@ def local(event, context):
     return AWSFunctions(config, dns, handler).local(event, context)
 
 
-def remote(event, context):
+def remote(event, context): # pragma: no cover
     config: ConfigProvider = S3ConfigProvider()
     config.load()
     dns: DNSProvider = Route53Provider(config)

@@ -1,0 +1,12 @@
+language: python
+
+python: 3.6
+
+install:
+  - pip install -r requirements.txt
+
+script:
+  - coverage run --source dynamicdns --branch --omit "*/__init__.py" -m unittest discover
+
+after_success:
+  - codecov -t $CODECOV_TOKEN
