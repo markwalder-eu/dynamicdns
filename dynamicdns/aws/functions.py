@@ -10,26 +10,23 @@ from dynamicdns.aws.route53 import Route53Provider
 
 
 def info(event, context): # pragma: no cover
-    config: ConfigProvider = S3ConfigProvider()
-    config.load()
-    dns: DNSProvider = Route53Provider(config)
-    handler: Handler = Handler(dns)
-    return AWSFunctions(config, dns, handler).info(event, context)
+    return __createAWSFunctions().info(event, context)
 
 def local(event, context): # pragma: no cover
-    config: ConfigProvider = S3ConfigProvider()
-    config.load()
-    dns: DNSProvider = Route53Provider(config)
-    handler: Handler = Handler(dns)
-    return AWSFunctions(config, dns, handler).local(event, context)
-
+    return __createAWSFunctions().local(event, context)
 
 def remote(event, context): # pragma: no cover
+    return __createAWSFunctions().remote(event, context)
+
+def script(event, context): # pragma: no cover
+    return __createAWSFunctions().script(event, context)
+
+def __createAWSFunctions(): # pragma: no cover
     config: ConfigProvider = S3ConfigProvider()
     config.load()
     dns: DNSProvider = Route53Provider(config)
     handler: Handler = Handler(dns)
-    return AWSFunctions(config, dns, handler).remote(event, context)
+    return AWSFunctions(config, dns, handler)
 
 
 class AWSFunctions:
@@ -87,3 +84,19 @@ class AWSFunctions:
             return fail(error, raw)
 
         return success(result, raw)
+
+    def script(self, event, context):
+        file = open("dynamicdns/scripts/dynamic-dns-client", "r") 
+        content = file.read()
+        file.close()
+
+        headers = {
+            "Content-Type": "text/plain"
+        }
+        body = content
+        response = {
+            "statusCode": 200,
+            "headers": headers,
+            "body": body
+        }
+        return response

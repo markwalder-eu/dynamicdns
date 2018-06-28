@@ -56,6 +56,13 @@ functions:
           path: remote
           method: post
 
+  script:
+    handler: dynamicdns/aws/functions.script
+    events:
+      - http:
+          path: script
+          method: get
+
 plugins:
   - serverless-python-requirements
   - serverless-domain-manager
