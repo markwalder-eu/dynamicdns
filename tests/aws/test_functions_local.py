@@ -56,30 +56,38 @@ class TestAWSFunctionsLocal(unittest.TestCase):
         self.assertEqual(a, b)
 
     def testLocalMissingParamSourceIp(self):
+        event = { 'queryStringParameters': { 'raw': '' } } 
+        self.__localCaller(event, True)
+
         event = {} 
-        self.__localCaller(event)
+        self.__localCaller(event, False)
 
         event = { 'requestContext': {} } 
-        self.__localCaller(event)
+        self.__localCaller(event, False)
 
         event = { 'requestContext': { 'identity': {} } } 
-        self.__localCaller(event)
+        self.__localCaller(event, False)
 
         event = { 'queryStringParameters': {}, 'requestContext': { 'identity': {} } }
-        self.__localCaller(event)
+        self.__localCaller(event, False)
 
 
-    def __localCaller(self, event):
+    def __localCaller(self, event, raw):
         context = {}
 
         result = self.functions.local(event, context)
 
-        self.assertEqual(result['statusCode'], 200)
-        self.assertEqual(result['headers']['Content-Type'], 'application/json')
-        
-        a = json.loads(result['body'])
-        b = json.loads('{ "status": "FAIL", "message": "Source IP address cannot be extracted from request context." }')
-        self.assertEqual(a, b)
+        if raw:
+            self.assertEqual(result['statusCode'], 200)
+            self.assertEqual(result['headers']['Content-Type'], 'text/plain')
+            self.assertEqual(result['body'],'FAIL\nSource IP address cannot be extracted from request context.')
+        else:
+            self.assertEqual(result['statusCode'], 200)
+            self.assertEqual(result['headers']['Content-Type'], 'application/json')
+            
+            a = json.loads(result['body'])
+            b = json.loads('{ "status": "FAIL", "message": "Source IP address cannot be extracted from request context." }')
+            self.assertEqual(a, b)
 
 
 if __name__ == '__main__':
