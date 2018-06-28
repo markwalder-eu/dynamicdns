@@ -5,7 +5,7 @@ from dynamicdns.models import Error, ConfigProvider, DNSProvider
 from dynamicdns.aws.s3config import S3ConfigProvider
 
 
-class Route53Provider(DNSProvider):
+class Route53Provider(DNSProvider): # pragma: no cover
 
     def __init(self, config: S3ConfigProvider):
         super().__init__(config)

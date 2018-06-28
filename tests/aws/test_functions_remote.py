@@ -61,6 +61,24 @@ class TestAWSFunctionsRemote(unittest.TestCase):
         self.__remoteCaller(event, "You have to pass 'hash' querystring parameters.")
 
 
+    def testRemoteMissingParamInternalIp(self):
+        self.__setUpMocks(hashFailed=False, updateFailed=False)
+        event = {
+            'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz'},
+            'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
+        }
+        context = {}
+        
+        result = self.functions.remote(event, context)
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'application/json')
+        
+        a = json.loads(result['body'])
+        b = json.loads('{ "status": "SUCCESS", "message": "OK" }')
+        self.assertEqual(a, b)
+
+
     def testRemoteMissingParamSourceIp(self):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
         event = {
@@ -71,6 +89,12 @@ class TestAWSFunctionsRemote(unittest.TestCase):
         event = {
             'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz', 'internalip': '2.2.2.2'},
             'requestContext': {}
+        }
+        self.__remoteCaller(event, "Source IP address cannot be extracted from request context.")
+
+        event = {
+            'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz', 'internalip': '2.2.2.2'},
+            'requestContext': None
         }
         self.__remoteCaller(event, "Source IP address cannot be extracted from request context.")
 

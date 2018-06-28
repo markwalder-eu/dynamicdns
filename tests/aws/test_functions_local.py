@@ -65,6 +65,9 @@ class TestAWSFunctionsLocal(unittest.TestCase):
         event = { 'requestContext': {} } 
         self.__localCaller(event, False)
 
+        event = { 'requestContext': None } 
+        self.__localCaller(event, False)
+
         event = { 'requestContext': { 'identity': {} } } 
         self.__localCaller(event, False)
 

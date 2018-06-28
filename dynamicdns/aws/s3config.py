@@ -5,7 +5,7 @@ import os
 from dynamicdns.models import ConfigProvider
 
 
-class S3ConfigProvider(ConfigProvider):
+class S3ConfigProvider(ConfigProvider): # pragma: no cover
 
     def load(self):
         config_s3_region: str = os.environ['CONFIG_S3_REGION']
