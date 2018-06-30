@@ -1,10 +1,11 @@
 #!/bin/bash
 
 usage() {
-    echo "usage: client -u <url> -h <hostname> -s <shared secret> [-i <internalip>]"
+    echo "usage: client [-c <config>] | [-u <url> [-h <hostname>] | [-s <shared secret>] | [-i <internalip>]"
     exit
 }
 
+type grep   >/dev/null 2>&1 || { echo >&2 "I require 'grep' but it's not installed. Aborting."; exit 1; }
 type head   >/dev/null 2>&1 || { echo >&2 "I require 'head' but it's not installed. Aborting."; exit 1; }
 type tail   >/dev/null 2>&1 || { echo >&2 "I require 'tail' but it's not installed. Aborting."; exit 1; }
 type awk    >/dev/null 2>&1 || { echo >&2 "I require 'awk' but it's not installed. Aborting."; exit 1; }
@@ -13,6 +14,9 @@ type curl   >/dev/null 2>&1 || { echo >&2 "I require 'curl' but it's not install
 
 while [ "$1" != "" ]; do
     case $1 in
+        -c | --config )         shift
+                                config=$1 
+                                ;;
         -u | --url )            shift
                                 url=$1
                                 ;;
@@ -32,6 +36,13 @@ while [ "$1" != "" ]; do
     esac
     shift
 done
+
+if [ ! -z $config ] && [ -e $config ]; then
+    [ -z $url ] && eval $(grep url $config)
+    [ -z $hostname ] && eval $(grep hostname $config)
+    [ -z $sharedsecret ] && eval $(grep sharedsecret $config)
+    [ -z $internalip ] && eval $(grep internalip $config)
+fi
 
 [ -z $url ] && usage
 [ -z $hostname ] && usage
