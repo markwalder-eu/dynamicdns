@@ -38,10 +38,10 @@ while [ "$1" != "" ]; do
 done
 
 if [ ! -z $config ] && [ -e $config ]; then
-    [ -z $url ] && eval $(grep url $config)
-    [ -z $hostname ] && eval $(grep hostname $config)
-    [ -z $sharedsecret ] && eval $(grep sharedsecret $config)
-    [ -z $internalip ] && eval $(grep internalip $config)
+    [ -z $url ] && eval $(grep url= $config | grep -v "#")
+    [ -z $hostname ] && eval $(grep hostname= $config | grep -v "#")
+    [ -z $sharedsecret ] && eval $(grep sharedsecret= $config | grep -v "#")
+    [ -z $internalip ] && eval $(grep internalip= $config | grep -v "#")
 fi
 
 [ -z $url ] && usage
