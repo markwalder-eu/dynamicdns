@@ -10,7 +10,7 @@ install:
 
 script:
   - coverage run --source dynamicdns --branch --omit "*/__init__.py" -m unittest discover
-  - sls version
+  - sls deploy
 
 after_success:
   - codecov -t $CODECOV_TOKEN
