@@ -37,6 +37,12 @@ provider:
         - "arn:aws:route53:::hostedzone/*"
 
 functions:
+  version:
+    handler: dynamicdns/aws/functions.version
+    events:
+      - http:
+          path: version
+          method: get
   info:
     handler: dynamicdns/aws/functions.info
     events:

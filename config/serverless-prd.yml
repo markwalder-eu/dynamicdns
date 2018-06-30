@@ -1,5 +1,0 @@
-domainName: api.markwalder.eu
-s3Region: us-east-1
-s3Bucket: dynamic-dns-markwalder-eu-prd
-s3Key: config-prd.json
-certificateName: '*.markwalder.eu'

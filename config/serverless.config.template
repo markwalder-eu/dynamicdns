@@ -1,0 +1,5 @@
+domainName: @@DOMAIN_NAME@@
+s3Region: @@S3_REGION@@
+s3Bucket: @@S3_BUCKET@@
+s3Key: @@S3_KEY@@
+certificateName: '@@CERTIFICATE_NAME@@'

@@ -5,3 +5,7 @@ __pycache__
 .vscode
 .coverage
 htmlcov
+
+config/client-*.config
+config/server-*.config
+config/serverless-*.config

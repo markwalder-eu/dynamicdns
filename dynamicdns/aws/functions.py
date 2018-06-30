@@ -1,6 +1,8 @@
 import os
 import json
 
+import dynamicdns
+
 from dynamicdns.models import Error, ConfigProvider, DNSProvider
 from dynamicdns.handler import Handler
 from dynamicdns.util import success, fail, keyExists
@@ -8,6 +10,9 @@ from dynamicdns.util import success, fail, keyExists
 from dynamicdns.aws.s3config import S3ConfigProvider
 from dynamicdns.aws.route53 import Route53Provider
 
+
+def version(event, context): # pragma: no cover
+    return __createAWSFunctions().version(event, context)
 
 def info(event, context): # pragma: no cover
     return __createAWSFunctions().info(event, context)
@@ -36,6 +41,17 @@ class AWSFunctions:
         self.dns = dns
         self.handler = handler
 
+
+    def version(self, event, context):
+        return {
+            "statusCode": 200,
+            "headers": { "Content-Type": "application/json" },
+            "body": {
+                "version":      dynamicdns.__version__,
+                "author":       dynamicdns.__author__,
+                "author-email": dynamicdns.__author_email__
+            } 
+        } 
 
     def info(self, event, context):
         return success(event, False)
