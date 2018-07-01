@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage() {
-    echo "usage: client [-c <config>] | [-u <url> [-h <hostname>] | [-s <shared secret>] | [-i <internalip>]"
+    echo "usage: dynamic-dns-client [-c <config>] | [-u <url> [-h <hostname>] | [-s <shared secret>] | [-i <internalip>]"
     exit
 }
 

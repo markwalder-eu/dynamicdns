@@ -1,0 +1,142 @@
+#!/bin/bash
+
+usage() {
+    echo "Usage: create-config [OPTION]"
+    echo "Create configuration files for Dynamic DNS Utility"
+    echo ""
+    echo "--silent"
+    echo "--stage <stage>"
+    echo "--hostname <hostname>"
+    echo "--shared-secret <shared secret>"
+    echo "--api-domain-name <API domain name>"
+    echo "--api-domain-certificate-name <API domain certificate name>"
+    echo "--route53-region <Route 53 - Region>"
+    echo "--route53-zone-id <Route 53 - Zone ID>"
+    echo "--route53-record-ttl <Route 53 - Record TTL>"
+    echo "--route53-record-type <Route 53 - Record Type>"
+    echo "--s3-region <S3 - Region>"
+    echo "--s3-bucket <S3 - Bucket>"
+    echo "--s3-key <S3 - Key>" 
+    echo ""   
+    exit
+}
+
+#type grep   >/dev/null 2>&1 || { echo >&2 "I require 'grep' but it's not installed. Aborting."; exit 1; }
+
+SILENT=no
+while [ "$1" != "" ]; do
+    case $1 in
+        --silent )                      shift
+                                        SILENT=yes
+                                        ;;
+        --stage )                       shift
+                                        STAGE=$1
+                                        ;;
+        --hostname )                    shift
+                                        DNS_HOSTNAME=$1
+                                        ;;
+        --shared-secret )               shift
+                                        SHARED_SECRET=$1
+                                        ;;
+        --api-domain-name )             shift
+                                        API_DOMAIN_NAME=$1
+                                        ;;
+        --api-domain-certificate-name ) shift
+                                        API_DOMAIN_CERTIFICATE_NAME=$1
+                                        ;;
+        --route53-region )              shift
+                                        ROUTE_53_REGION=$1
+                                        ;;
+        --route53-zone-id )             shift
+                                        ROUTE_53_ZONE_ID=$1
+                                        ;;
+        --route53-record-ttl )          shift
+                                        ROUTE_53_RECORD_TTL=$1
+                                        ;;
+        --route53-record-type )         shift
+                                        ROUTE_53_RECORD_TYPE=$1
+                                        ;;
+        --s3-region )                   shift
+                                        S3_REGION=$1
+                                        ;;
+        --s3-bucket )                   shift
+                                        S3_BUCKET=$1
+                                        ;;
+        --s3-key )                      shift
+                                        S3_KEY=$1
+                                        ;;
+        -h | --help )                   usage
+                                        ;;
+        * )                             usage
+                                        ;;
+    esac
+    shift
+done
+
+if [ "$SILENT" == "no" ]; then
+    read -p "Stage                          : " STAGE
+    read -p "Hostname                       : " DNS_HOSTNAME
+    read -p "Shared Secret                  : " SHARED_SECRET
+    read -p "API Domain - Name              : " API_DOMAIN_NAME
+    read -p "API Domain - Certificate Name  : " API_DOMAIN_CERTIFICATE_NAME
+    read -p "Route 53 - Region              : " ROUTE_53_REGION
+    read -p "Route 53 - Zone ID             : " ROUTE_53_ZONE_ID
+    read -p "Route 53 - Record TTL          : " ROUTE_53_RECORD_TTL
+    read -p "Route 53 - Record Type         : " ROUTE_53_RECORD_TYPE
+    read -p "S3 - Region                    : " S3_REGION
+    read -p "S3 - Bucket                    : " S3_BUCKET
+    read -p "S3 - Key                       : " S3_KEY
+fi
+
+[ -z $STAGE ] && usage
+[ -z $DNS_HOSTNAME ] && usage
+[ -z $SHARED_SECRET ] && usage
+[ -z $API_DOMAIN_NAME ] && usage
+[ -z $API_DOMAIN_CERTIFICATE_NAME ] && usage
+[ -z $ROUTE_53_REGION ] && usage
+[ -z $ROUTE_53_ZONE_ID ] && usage
+[ -z $ROUTE_53_RECORD_TTL ] && usage
+[ -z $ROUTE_53_RECORD_TYPE ] && usage
+[ -z $S3_REGION ] && usage
+[ -z $S3_BUCKET ] && usage
+[ -z $S3_KEY ] && usage
+
+URL=https://$API_DOMAIN_NAME
+
+echo "Data"
+echo "===="
+echo $SILENT
+echo $STAGE
+echo $DNS_HOSTNAME
+echo $SHARED_SECRET
+echo $API_DOMAIN_NAME
+echo $API_DOMAIN_CERTIFICATE_NAME
+echo $ROUTE_53_REGION
+echo $ROUTE_53_ZONE_ID
+echo $ROUTE_53_RECORD_TTL
+echo $ROUTE_53_RECORD_TYPE
+echo $S3_REGION
+echo $S3_BUCKET
+echo $S3_KEY
+
+BASEDIR=$(dirname "$0")
+cp $BASEDIR/server.config.template $BASEDIR/server-$STAGE.config
+cp $BASEDIR/serverless.config.template $BASEDIR/serverless-$STAGE.config
+cp $BASEDIR/client.config.template $BASEDIR/client-$STAGE.config
+
+
+
+exit 0
+
+SILENT
+DNS_HOSTNAME
+SHARED_SECRET
+API_DOMAIN_NAME
+API_DOMAIN_CERTIFICATE_NAME
+ROUTE_53_REGION
+ROUTE_53_ZONE_ID
+ROUTE_53_RECORD_TTL
+ROUTE_53_RECORD_TYPE
+S3_REGION
+S3_BUCKET
+S3_KEY

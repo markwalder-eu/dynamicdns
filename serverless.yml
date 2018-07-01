@@ -3,10 +3,10 @@ custom:
   stage: ${opt:stage, 'dev'}
   config: ${file(config/serverless-${self:custom.stage}.config)}
   customDomain:
-    domainName: ${self:custom.config.domainName}
+    domainName: ${self:custom.config.apiDomainName}
     basePath: dynamicdns-${self:custom.version}
     stage: ${self:custom.stage}
-    certificateName: ${self:custom.config.certificateName}
+    certificateName: ${self:custom.config.apiDomainCertificateName}
     createRoute53Record: true
   pythonRequirements:
     dockerizePip: non-linux
