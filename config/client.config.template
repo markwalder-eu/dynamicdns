@@ -5,7 +5,7 @@ url=@@URL@@
 
 # Hostname of DNS and config entry
 # e.g. hostname=home.domain.com
-hostname=@@HOSTNAME@@
+hostname=@@DNS_HOSTNAME@@
 
 # Shared secret to use for communication
 # e.g. sharedsecret=ZDhszNKMbmuFYBhZgAuzoQFbmcqM6CYb

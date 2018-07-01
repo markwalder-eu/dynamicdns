@@ -1,8 +1,8 @@
 {
-	"@@HOSTNAME@@": {
+	"@@DNS_HOSTNAME@@": {
 		"aws_region": "@@S3_REGION@@",
 		"route_53_zone_id": "@@ROUTE53_ZONE_ID@@",
-		"route_53_record_ttl": @@ROUTE53_RECORD_TTL@,
+		"route_53_record_ttl": @@ROUTE53_RECORD_TTL@@,
 		"route_53_record_type": "@@ROUTE53_RECORD_TYPE@@",
 		"shared_secret": "@@SHARED_SECRET@@"
 	}
