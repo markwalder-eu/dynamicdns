@@ -2,10 +2,10 @@ import boto3
 import json
 import os
 
-from dynamicdns.models import ConfigProvider
+from dynamicdns.models import Error, ConfigProvider
 
 
-class S3ConfigProvider(ConfigProvider): # pragma: no cover
+class S3ConfigProvider(ConfigProvider):
 
     def load(self):
         config_s3_region: str = os.environ['CONFIG_S3_REGION']
@@ -15,14 +15,14 @@ class S3ConfigProvider(ConfigProvider): # pragma: no cover
         if not ('CONFIG_S3_REGION' in os.environ 
             and 'CONFIG_S3_BUCKET' in os.environ 
             and 'CONFIG_S3_KEY' in os.environ):
-            raise "You have to configure the environment variables CONFIG_S3_REGION, CONFIG_S3_BUCKET and CONFIG_S3_KEY."
+            return Error("You have to configure the environment variables CONFIG_S3_REGION, CONFIG_S3_BUCKET and CONFIG_S3_KEY.")
 
         try:
             s3 = boto3.client('s3', config_s3_region)    
             data = s3.get_object(Bucket=config_s3_bucket, Key=config_s3_key)
             self.config = json.loads(data['Body'].read())
-        except Exception as ex:
-            raise "Could not read configuration. Exception: " + str(ex)
+        except Exception:
+            return Error("Could not read configuration.")
         
     def aws_region(self, hostname: str):
         return self.__checkAndReturn(hostname, 'aws_region')

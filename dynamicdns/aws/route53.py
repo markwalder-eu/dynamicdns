@@ -5,7 +5,7 @@ from dynamicdns.models import Error, ConfigProvider, DNSProvider
 from dynamicdns.aws.s3config import S3ConfigProvider
 
 
-class Route53Provider(DNSProvider): # pragma: no cover
+class Route53Provider(DNSProvider):
 
     def __init(self, config: S3ConfigProvider):
         super().__init__(config)
@@ -26,7 +26,7 @@ class Route53Provider(DNSProvider): # pragma: no cover
                         for subrecord in record['ResourceRecords']:
                             return subrecord['Value']                   
                     elif len(record['ResourceRecords']) > 1:
-                        raise 'You should only have a single value for your dynamic record.  You currently have more than one.'
+                        return Error('You should only have a single value for your dynamic record.  You currently have more than one.')
             return ""
         except:
             return Error("Retrieval of current ip address failed.")

@@ -11,24 +11,46 @@ from dynamicdns.aws.s3config import S3ConfigProvider
 from dynamicdns.aws.route53 import Route53Provider
 
 
-def version(event, context): # pragma: no cover
-    return __createAWSFunctions().version(event, context)
+def version(event, context):
+    fn = error = __createAWSFunctions()
+    if isinstance(error, Error):
+        raw: bool = keyExists(event, 'queryStringParameters', 'raw')
+        return fail(error, raw)
+    return fn.version(event, context)
 
-def info(event, context): # pragma: no cover
-    return __createAWSFunctions().info(event, context)
+def info(event, context):
+    fn = error = __createAWSFunctions()
+    if isinstance(error, Error):
+        raw: bool = keyExists(event, 'queryStringParameters', 'raw')
+        return fail(error, raw)
+    return fn.info(event, context)
 
-def local(event, context): # pragma: no cover
-    return __createAWSFunctions().local(event, context)
+def local(event, context):
+    fn = error = __createAWSFunctions()
+    if isinstance(error, Error):
+        raw: bool = keyExists(event, 'queryStringParameters', 'raw')
+        return fail(error, raw)
+    return fn.local(event, context)
 
-def remote(event, context): # pragma: no cover
-    return __createAWSFunctions().remote(event, context)
+def remote(event, context):
+    fn = error = __createAWSFunctions()
+    if isinstance(error, Error):
+        raw: bool = keyExists(event, 'queryStringParameters', 'raw')
+        return fail(error, raw)
+    return fn.remote(event, context)
 
-def script(event, context): # pragma: no cover
-    return __createAWSFunctions().script(event, context)
-
-def __createAWSFunctions(): # pragma: no cover
+def script(event, context):
+    fn = error = __createAWSFunctions()
+    if isinstance(error, Error):
+        raw: bool = keyExists(event, 'queryStringParameters', 'raw')
+        return fail(error, raw)
+    return fn.script(event, context)
+ 
+def __createAWSFunctions():
     config: ConfigProvider = S3ConfigProvider()
-    config.load()
+    error = config.load()
+    if isinstance(error, Error):
+        return error
     dns: DNSProvider = Route53Provider(config)
     handler: Handler = Handler(dns)
     return AWSFunctions(config, dns, handler)
