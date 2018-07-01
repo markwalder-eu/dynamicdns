@@ -1,9 +1,8 @@
-import boto3
 import json
 import os
 
 from dynamicdns.models import Error, ConfigProvider
-
+from dynamicdns.aws.boto3wrapper import Boto3Wrapper
 
 class S3ConfigProvider(ConfigProvider):
 
@@ -18,7 +17,7 @@ class S3ConfigProvider(ConfigProvider):
             return Error("You have to configure the environment variables CONFIG_S3_REGION, CONFIG_S3_BUCKET and CONFIG_S3_KEY.")
 
         try:
-            s3 = boto3.client('s3', config_s3_region)    
+            s3 = Boto3Wrapper.get_client('s3', config_s3_region)    
             data = s3.get_object(Bucket=config_s3_bucket, Key=config_s3_key)
             self.config = json.loads(data['Body'].read())
         except Exception:

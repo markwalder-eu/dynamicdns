@@ -1,8 +1,7 @@
-import boto3
 
 from dynamicdns.models import Error, ConfigProvider, DNSProvider
-
 from dynamicdns.aws.s3config import S3ConfigProvider
+from dynamicdns.aws.boto3wrapper import Boto3Wrapper
 
 
 class Route53Provider(DNSProvider):
@@ -13,7 +12,7 @@ class Route53Provider(DNSProvider):
 
     def read(self, hostname: str):
         try:
-            client = boto3.client('route53', region_name = self.config.aws_region(hostname))
+            client = Boto3Wrapper.get_client('route53', region_name = self.config.aws_region(hostname) )
             recordset = client.list_resource_record_sets(
                 HostedZoneId = self.config.route_53_zone_id(hostname), 
                 StartRecordName = hostname, 
@@ -34,7 +33,7 @@ class Route53Provider(DNSProvider):
 
     def update(self, hostname: str, updateip: str):
         try:
-            client = boto3.client('route53', region_name = self.config.aws_region(hostname))
+            client = Boto3Wrapper.get_client('route53', region_name = self.config.aws_region(hostname))
             client.change_resource_record_sets(
                 HostedZoneId = self.config.route_53_zone_id(hostname),
                 ChangeBatch={
