@@ -129,7 +129,7 @@ BASEDIR=$(dirname "$0")
 cp $BASEDIR/server.config.template $BASEDIR/server-$STAGE.config
 replace-tokens $BASEDIR/server-$STAGE.config
 
-cp $BASEDIR/serverless.config.template $BASEDIR/serverless-$STAGE.config
+cp $BASEDIR/serverless.config.yml.template $BASEDIR/serverless-$STAGE.config.yml
 replace-tokens $BASEDIR/serverless-$STAGE.config
 
 cp $BASEDIR/client.config.template $BASEDIR/client-$STAGE.config

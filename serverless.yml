@@ -1,7 +1,7 @@
 custom:
   version: v1
   stage: ${opt:stage, 'dev'}
-  config: ${file(config/serverless-${self:custom.stage}.config)}
+  config: ${file(config/serverless-${self:custom.stage}.config.yml)}
   customDomain:
     domainName: ${self:custom.config.apiDomainName}
     basePath: dynamicdns-${self:custom.version}

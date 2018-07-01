@@ -8,4 +8,4 @@ htmlcov
 
 config/client-*.config
 config/server-*.config
-config/serverless-*.config
+config/serverless-*.config.yml
