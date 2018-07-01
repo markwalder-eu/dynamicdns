@@ -134,3 +134,11 @@ replace-tokens $BASEDIR/serverless-$STAGE.config
 
 cp $BASEDIR/client.config.template $BASEDIR/client-$STAGE.config
 replace-tokens $BASEDIR/client-$STAGE.config
+
+echo ""
+echo "Successfully created config files"
+echo "- $BASEDIR/server-$STAGE.config"
+echo "- $BASEDIR/serverless-$STAGE.config"
+echo "- $BASEDIR/client-$STAGE.config"
+echo ""
+exit 0
