@@ -65,15 +65,21 @@ class AWSFunctions:
 
 
     def version(self, event, context):
-        return {
-            "statusCode": 200,
-            "headers": { "Content-Type": "application/json" },
-            "body": {
-                "version":      dynamicdns.__version__,
-                "author":       dynamicdns.__author__,
-                "author-email": dynamicdns.__author_email__
-            } 
+        metadata = {
+            "version":      dynamicdns.__version__,
+            "author":       dynamicdns.__author__,
+            "author-email": dynamicdns.__author_email__
         } 
+        return success(metadata,False)
+#         return {
+#            "statusCode": 200,
+#            "headers": { "Content-Type": "application/json" },
+#            "body": {
+#                "version":      dynamicdns.__version__,
+#                "author":       dynamicdns.__author__,
+#                "author-email": dynamicdns.__author_email__
+#            } 
+#        } 
 
     def info(self, event, context):
         return success(event, False)
