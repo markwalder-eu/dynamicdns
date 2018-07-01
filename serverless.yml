@@ -18,6 +18,7 @@ package:
     - ./**
   include:
     - dynamicdns/**
+    - config/**
     
 provider:
   name: aws
