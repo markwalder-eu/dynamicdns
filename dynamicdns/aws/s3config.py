@@ -34,8 +34,8 @@ class S3ConfigProvider(ConfigProvider):
             )
             body = data['Body'].read()
             self.config = json.loads(body)
-        except Exception:
-            return Error("Could not read configuration.")
+        except Exception as ex:
+            return Error("Could not read configuration. Excpeption: " + str(ex))
         
     def aws_region(self, hostname: str):
         return self.__checkAndReturn(hostname, 'aws_region')
