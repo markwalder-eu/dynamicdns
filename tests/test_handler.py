@@ -114,9 +114,7 @@ class TestHandler(unittest.TestCase):
 
 
     def __setUpMocks(self, readReturnValue, updateReturnValue):
-        config = S3ConfigProvider()
-
-        dns = Route53Provider(config)
+        dns = Route53Provider()
         dns.read = MagicMock(return_value=readReturnValue)
         dns.update = MagicMock(return_value=updateReturnValue)
         

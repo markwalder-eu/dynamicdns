@@ -1,10 +1,15 @@
 import json
 import os
 
+import tempfile
+
 from dynamicdns.models import Error, ConfigProvider
 from dynamicdns.aws.boto3wrapper import Boto3Wrapper
 
 class S3ConfigProvider(ConfigProvider):
+
+    def __init__(self, boto3_wrapper: Boto3Wrapper):
+        self.boto3_wrapper = boto3_wrapper 
 
     def load(self):
         config_s3_region: str = os.environ['CONFIG_S3_REGION']
@@ -16,10 +21,19 @@ class S3ConfigProvider(ConfigProvider):
             and 'CONFIG_S3_KEY' in os.environ):
             return Error("You have to configure the environment variables CONFIG_S3_REGION, CONFIG_S3_BUCKET and CONFIG_S3_KEY.")
 
+#        session = Boto3Wrapper.get_session()
+#        s3 = session.client(service_name='s3', region_name=config_s3_region)
+#        data = s3.get_object(Bucket=config_s3_bucket, Key=config_s3_key)
+
         try:
-            s3 = Boto3Wrapper.get_client('s3', config_s3_region)    
-            data = s3.get_object(Bucket=config_s3_bucket, Key=config_s3_key)
-            self.config = json.loads(data['Body'].read())
+            data = self.boto3_wrapper.client_get_object(
+                service_name='s3',
+                region_name=config_s3_region, 
+                Bucket=config_s3_bucket,
+                Key=config_s3_key
+            )
+            body = data['Body'].read()
+            self.config = json.loads(body)
         except Exception:
             return Error("Could not read configuration.")
         

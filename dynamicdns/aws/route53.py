@@ -6,14 +6,16 @@ from dynamicdns.aws.boto3wrapper import Boto3Wrapper
 
 class Route53Provider(DNSProvider):
 
-    def __init(self, config: S3ConfigProvider):
-        super().__init__(config)
+    def __init(self, boto3_wrapper: Boto3Wrapper, config: S3ConfigProvider):
+        self.boto3_wrapper = boto3_wrapper
+        self.config = config
 
 
     def read(self, hostname: str):
         try:
-            client = Boto3Wrapper.get_client('route53', region_name = self.config.aws_region(hostname) )
-            recordset = client.list_resource_record_sets(
+            recordset = self.boto3_wrapper.client_list_resource_record_sets(
+                service_name = 'route53',
+                region_name = self.config.aws_region(hostname),
                 HostedZoneId = self.config.route_53_zone_id(hostname), 
                 StartRecordName = hostname, 
                 StartRecordType = self.config.route_53_record_type(hostname), 
@@ -33,10 +35,11 @@ class Route53Provider(DNSProvider):
 
     def update(self, hostname: str, updateip: str):
         try:
-            client = Boto3Wrapper.get_client('route53', region_name = self.config.aws_region(hostname))
-            client.change_resource_record_sets(
+            self.boto3_wrapper.client_change_resource_record_sets(
+                service_name = 'route53',
+                region_name = self.config.aws_region(hostname),
                 HostedZoneId = self.config.route_53_zone_id(hostname),
-                ChangeBatch={
+                ChangeBatch = {
                     'Changes': [
                         {
                             'Action': 'UPSERT',

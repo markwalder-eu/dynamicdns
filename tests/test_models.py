@@ -20,7 +20,7 @@ class TestModels(unittest.TestCase):
         class DNSProviderTest(DNSProvider):
             pass
         
-        dns = DNSProviderTest(None)
+        dns = DNSProviderTest()
 
         self.assertRaises(NotImplementedError, dns.read, 'abc')
         self.assertRaises(NotImplementedError, dns.update, 'abc', 'def')

@@ -9,14 +9,14 @@ from unittest.mock import MagicMock
 class TestAWSFunctionsLocal(unittest.TestCase):
 
     def setUp(self):
-        config = S3ConfigProvider()
+        config = S3ConfigProvider(None)
         config.aws_region = MagicMock(return_value='aws_region')
         config.route_53_record_ttl = MagicMock(return_value='route_53_record_ttl')
         config.route_53_record_type = MagicMock(return_value='route_53_record_type')
         config.route_53_zone_id = MagicMock(return_value='route_53_zone_id')
         config.shared_secret = MagicMock(return_value='shared_secret')
 
-        dns = Route53Provider(config)
+        dns = Route53Provider()
         dns.read = MagicMock(return_value="1.1.1.1")
         dns.update = MagicMock(return_value=None)
         

@@ -18,9 +18,6 @@ class ConfigProvider:
 
 class DNSProvider:
 
-    def __init__(self, config: ConfigProvider):
-        self.config = config
-
     def read(self, hostname: str):
         raise NotImplementedError("Subclass must implement abstract method")
 
