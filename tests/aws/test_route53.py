@@ -136,3 +136,7 @@ class TestRoute53Provider(unittest.TestCase):
         config.shared_secret = MagicMock(return_value='shared_secret')
 
         return Route53Provider(boto3_wrapper, config)
+
+
+if __name__ == '__main__':
+    unittest.main()

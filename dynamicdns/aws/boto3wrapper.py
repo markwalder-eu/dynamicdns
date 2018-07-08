@@ -6,7 +6,8 @@ class Boto3Wrapper():
     
     def client_get_object(self, region, bucket, key):
         client = boto3.client(service_name='s3',region_name=region)
-        return client.get_object(Bucket=bucket, Key=key)
+        data = client.get_object(Bucket=bucket, Key=key)
+        return data['Body'].read().decode('utf-8')
 
     def client_list_resource_record_sets(self, region, hosted_zone_id, start_record_name, start_record_type, max_items):
         client = boto3.client(service_name='route53', region_name=region)

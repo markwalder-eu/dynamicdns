@@ -4,4 +4,3 @@ pylint
 wheel
 coverage
 codecov
-placebo
