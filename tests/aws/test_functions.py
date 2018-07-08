@@ -3,12 +3,41 @@ import unittest
 
 from unittest.mock import MagicMock
 
+import dynamicdns
+
 from dynamicdns.models import Error
 from dynamicdns.aws.functions import (AWSFunctions, Route53Provider, S3ConfigProvider)
 from dynamicdns.handler import Handler
 
 
 class TestAWSFunctionsInfo(unittest.TestCase):
+
+
+# -----------------------------------------------------------------------------
+# VERSION
+# -----------------------------------------------------------------------------
+
+    
+    def testVersion(self):
+        self.__setUpMocks(hashFailed=False, updateFailed=False)
+        event = {
+            'queryStringParameters': {},
+            'requestContext': {}
+        } 
+        context = {}
+
+        result = self.functions.version(event, context)
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'application/json')
+        
+        a = json.loads(result['body'])
+        b = json.loads('{ ' + 
+            '"version": "' + dynamicdns.__version__ + '", ' + 
+            '"author": "' + dynamicdns.__author__ + '", ' + 
+            '"author-email": "' + dynamicdns.__author_email__ + '" ' +    
+        '}')
+        self.assertEqual(a, b)
 
 
 # -----------------------------------------------------------------------------
