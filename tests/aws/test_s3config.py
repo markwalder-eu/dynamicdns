@@ -37,6 +37,50 @@ class TestS3ConfigProvider(unittest.TestCase):
             self.assertEqual(config.shared_secret('hostname'), 'shared-secret')
 
 
+    def testMissingHostname(self):
+        config: S3ConfigProvider = self.__createConfigProvider(
+        {   "hostname": {
+                "aws_region": "region",
+                "route_53_zone_id": "zone-id",
+                "route_53_record_ttl": 42,
+                "route_53_record_type": "record-type",
+                "shared_secret": "shared-secret"
+            }
+        })
+
+        with patch.dict('os.environ', {
+            'CONFIG_S3_REGION': 'region',
+            'CONFIG_S3_BUCKET': 'bucket',
+            'CONFIG_S3_KEY': 'key',
+        }):
+            result = config.load()
+
+            self.assertFalse(isinstance(result, Error))
+            with self.assertRaises(Exception):
+                config.aws_region('hostname-not-in-config')
+
+
+    def testMissingAttribute(self):
+        config: S3ConfigProvider = self.__createConfigProvider(
+        {   "hostname": {
+                "route_53_zone_id": "zone-id",
+                "route_53_record_ttl": 42,
+                "route_53_record_type": "record-type",
+                "shared_secret": "shared-secret"
+            }
+        })
+
+        with patch.dict('os.environ', {
+            'CONFIG_S3_REGION': 'region',
+            'CONFIG_S3_BUCKET': 'bucket',
+            'CONFIG_S3_KEY': 'key',
+        }):
+            result = config.load()
+
+            self.assertFalse(isinstance(result, Error))
+            with self.assertRaises(Exception):
+                config.aws_region('hostname')
+
     def testReadException(self):
         config: S3ConfigProvider = self.__createConfigProvider(None, readException=True)
 

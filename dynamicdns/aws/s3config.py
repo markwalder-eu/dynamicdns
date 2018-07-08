@@ -46,5 +46,5 @@ class S3ConfigProvider(ConfigProvider):
 
     def __checkAndReturn(self, hostname: str, attr: str):
         if not hostname in self.config or not attr in self.config[hostname]:
-            raise "Configuration for hostname '" + hostname + "' and attribute '" +  attr+ "' not found."            
+            raise Exception("Configuration for hostname '" + hostname + "' and attribute '" +  attr+ "' not found.")
         return self.config[hostname][attr]
