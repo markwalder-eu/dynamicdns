@@ -1,14 +1,102 @@
-import unittest
 import json
+import unittest
 
 from unittest.mock import MagicMock
 
-from dynamicdns.aws.functions import AWSFunctions, S3ConfigProvider, Route53Provider
-from dynamicdns.handler import Handler
 from dynamicdns.models import Error
+from dynamicdns.aws.functions import (AWSFunctions, Route53Provider, S3ConfigProvider)
+from dynamicdns.handler import Handler
 
 
-class TestAWSFunctionsRemote(unittest.TestCase):
+class TestAWSFunctionsInfo(unittest.TestCase):
+
+
+# -----------------------------------------------------------------------------
+# INFO
+# -----------------------------------------------------------------------------
+
+    
+    def testInfo(self):
+        self.__setUpMocks(hashFailed=False, updateFailed=False)
+        event = {
+            'queryStringParameters': {},
+            'requestContext': {}
+        } 
+        context = {}
+
+        result = self.functions.info(event, context)
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'application/json')
+        
+        a = json.loads(result['body'])
+        b = json.loads('{ "status": "SUCCESS", "message": { "queryStringParameters": {}, "requestContext": {} } }')
+        self.assertEqual(a, b)
+
+
+# -----------------------------------------------------------------------------
+# LOCAL
+# -----------------------------------------------------------------------------
+
+
+    def testLocalRaw(self):
+        self.__setUpMocks(hashFailed=False, updateFailed=False)
+        event = {
+            'queryStringParameters': { 'raw': '' },
+            'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
+        } 
+        context = {}
+
+        result = self.functions.local(event, context)
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'text/plain')
+        self.assertEqual(result['body'],'SUCCESS\n1.1.1.1')
+
+
+    def testLocalJson(self):
+        self.__setUpMocks(hashFailed=False, updateFailed=False)
+        event = {
+            'queryStringParameters': {},
+            'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
+        } 
+        context = {}
+
+        result = self.functions.local(event, context)
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'application/json')
+        
+        a = json.loads(result['body'])
+        b = json.loads('{ "status": "SUCCESS", "message": "1.1.1.1" }')
+        self.assertEqual(a, b)
+
+
+    def testLocalMissingParamSourceIp(self):
+        self.__setUpMocks(hashFailed=False, updateFailed=False)
+        event = { 'queryStringParameters': { 'raw': '' } } 
+        self.__localCaller(event, True)
+
+        event = {} 
+        self.__localCaller(event, False)
+
+        event = { 'requestContext': {} } 
+        self.__localCaller(event, False)
+
+        event = { 'requestContext': None } 
+        self.__localCaller(event, False)
+
+        event = { 'requestContext': { 'identity': {} } } 
+        self.__localCaller(event, False)
+
+        event = { 'queryStringParameters': {}, 'requestContext': { 'identity': {} } }
+        self.__localCaller(event, False)
+
+
+# -----------------------------------------------------------------------------
+# REMOTE
+# -----------------------------------------------------------------------------
+
 
     def testRemoteRaw(self):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
@@ -141,6 +229,11 @@ class TestAWSFunctionsRemote(unittest.TestCase):
         self.assertEqual(a, b)
 
 
+# -----------------------------------------------------------------------------
+# TESTING HELPER METHODS
+# -----------------------------------------------------------------------------
+
+
     def __setUpMocks(self, hashFailed: bool, updateFailed: bool):
         config = S3ConfigProvider(None)
         config.aws_region = MagicMock(return_value='aws_region')
@@ -149,7 +242,7 @@ class TestAWSFunctionsRemote(unittest.TestCase):
         config.route_53_zone_id = MagicMock(return_value='route_53_zone_id')
         config.shared_secret = MagicMock(return_value='shared_secret')
 
-        dns = Route53Provider()
+        dns = Route53Provider(None, None)
         dns.read = MagicMock(return_value="1.1.1.1")
         dns.update = MagicMock(return_value=None)
         
@@ -167,6 +260,24 @@ class TestAWSFunctionsRemote(unittest.TestCase):
         self.functions = AWSFunctions(config, dns, handler)
 
 
+    def __localCaller(self, event, raw):
+        context = {}
+
+        result = self.functions.local(event, context)
+
+        if raw:
+            self.assertEqual(result['statusCode'], 200)
+            self.assertEqual(result['headers']['Content-Type'], 'text/plain')
+            self.assertEqual(result['body'],'FAIL\nSource IP address cannot be extracted from request context.')
+        else:
+            self.assertEqual(result['statusCode'], 200)
+            self.assertEqual(result['headers']['Content-Type'], 'application/json')
+            
+            a = json.loads(result['body'])
+            b = json.loads('{ "status": "FAIL", "message": "Source IP address cannot be extracted from request context." }')
+            self.assertEqual(a, b)
+
+
     def __remoteCaller(self, event, expMsg):
         context = {}
 
@@ -182,5 +293,3 @@ class TestAWSFunctionsRemote(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-

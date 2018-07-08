@@ -53,7 +53,7 @@ def __createAWSFunctions():
     error = config.load()
     if isinstance(error, Error):
         return error
-    dns: DNSProvider = Route53Provider(config)
+    dns: DNSProvider = Route53Provider(boto3_wrapper, config)
     handler: Handler = Handler(dns)
     return AWSFunctions(config, dns, handler)
 

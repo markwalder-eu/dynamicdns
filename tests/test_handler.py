@@ -114,7 +114,7 @@ class TestHandler(unittest.TestCase):
 
 
     def __setUpMocks(self, readReturnValue, updateReturnValue):
-        dns = Route53Provider()
+        dns = Route53Provider(None, None)
         dns.read = MagicMock(return_value=readReturnValue)
         dns.update = MagicMock(return_value=updateReturnValue)
         

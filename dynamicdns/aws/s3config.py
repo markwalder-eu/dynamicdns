@@ -21,16 +21,11 @@ class S3ConfigProvider(ConfigProvider):
             and 'CONFIG_S3_KEY' in os.environ):
             return Error("You have to configure the environment variables CONFIG_S3_REGION, CONFIG_S3_BUCKET and CONFIG_S3_KEY.")
 
-#        session = Boto3Wrapper.get_session()
-#        s3 = session.client(service_name='s3', region_name=config_s3_region)
-#        data = s3.get_object(Bucket=config_s3_bucket, Key=config_s3_key)
-
         try:
             data = self.boto3_wrapper.client_get_object(
-                service_name='s3',
-                region_name=config_s3_region, 
-                Bucket=config_s3_bucket,
-                Key=config_s3_key
+                region=config_s3_region, 
+                bucket=config_s3_bucket,
+                key=config_s3_key
             )
             body = data['Body'].read()
             self.config = json.loads(body)
