@@ -13,41 +13,42 @@ from dynamicdns.aws.route53 import Route53Provider
 
 
 def version(event, context):
-    fn = error = __createAWSFunctions()
+    fn = error = createAWSFunctions()
     if isinstance(error, Error):
         raw: bool = keyExists(event, 'queryStringParameters', 'raw')
         return fail(error, raw)
     return fn.version(event, context)
 
 def info(event, context):
-    fn = error = __createAWSFunctions()
+    fn = error = createAWSFunctions()
     if isinstance(error, Error):
         raw: bool = keyExists(event, 'queryStringParameters', 'raw')
         return fail(error, raw)
     return fn.info(event, context)
 
 def local(event, context):
-    fn = error = __createAWSFunctions()
+    fn = error = createAWSFunctions()
     if isinstance(error, Error):
         raw: bool = keyExists(event, 'queryStringParameters', 'raw')
         return fail(error, raw)
     return fn.local(event, context)
 
 def remote(event, context):
-    fn = error = __createAWSFunctions()
+    fn = error = createAWSFunctions()
     if isinstance(error, Error):
         raw: bool = keyExists(event, 'queryStringParameters', 'raw')
         return fail(error, raw)
     return fn.remote(event, context)
 
 def script(event, context):
-    fn = error = __createAWSFunctions()
+    fn = error = createAWSFunctions()
     if isinstance(error, Error):
         raw: bool = keyExists(event, 'queryStringParameters', 'raw')
         return fail(error, raw)
     return fn.script(event, context)
  
-def __createAWSFunctions():
+ 
+def createAWSFunctions():
     boto3_wrapper = Boto3Wrapper()
     config: ConfigProvider = S3ConfigProvider(boto3_wrapper)
     error = config.load()

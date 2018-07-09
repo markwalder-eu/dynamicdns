@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, Mock, patch, mock_open
 
 import dynamicdns
 
-from dynamicdns.aws.functions import __createAWSFunctions 
+from dynamicdns.aws.functions import createAWSFunctions 
 
 from dynamicdns.models import Error
 from dynamicdns.aws.functions import (AWSFunctions, Route53Provider, S3ConfigProvider, Boto3Wrapper)
@@ -16,11 +16,35 @@ class TestAWSFunctions(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
+# AWS FUNCTIONS INIT
+# -----------------------------------------------------------------------------
+
+
+    @patch('dynamicdns.aws.functions.S3ConfigProvider.load') 
+    def testAWSFunctionsInit(self, mocked_load):
+        mocked_load.return_value = None
+
+        result = dynamicdns.aws.functions.createAWSFunctions()
+
+        self.assertFalse(isinstance(result, Error))
+
+
+    @patch('dynamicdns.aws.functions.S3ConfigProvider.load') 
+    def testAWSFunctionsInitFail(self, mocked_load):
+        mocked_load.return_value = Error('Error')
+
+        result = dynamicdns.aws.functions.createAWSFunctions()
+
+        self.assertTrue(isinstance(result, Error))
+        self.assertEqual(str(result), 'Error')
+
+
+# -----------------------------------------------------------------------------
 # VERSION
 # -----------------------------------------------------------------------------
 
     
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testVersion(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
         mocked_create.return_value = self.functions
@@ -44,7 +68,7 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(a, b)
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testVersionModuleFunctionFailJson(self, mocked_create):
         mocked_create.return_value = Error('Error')
         
@@ -58,7 +82,7 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(a, b)
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testVersionModuleFunctionFailRaw(self, mocked_create):
         mocked_create.return_value = Error('Error')
         
@@ -74,7 +98,7 @@ class TestAWSFunctions(unittest.TestCase):
 # -----------------------------------------------------------------------------
 
     
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testInfo(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
         mocked_create.return_value = self.functions
@@ -94,7 +118,7 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(a, b)
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testInfoModuleFunctionFailJson(self, mocked_create):
         mocked_create.return_value = Error('Error')
         
@@ -108,7 +132,7 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(a, b)
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testInfoModuleFunctionFailRaw(self, mocked_create):
         mocked_create.return_value = Error('Error')
         
@@ -124,7 +148,7 @@ class TestAWSFunctions(unittest.TestCase):
 # -----------------------------------------------------------------------------
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testLocalRaw(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
         mocked_create.return_value = self.functions
@@ -141,7 +165,7 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(result['body'],'SUCCESS\n1.1.1.1')
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testLocalJson(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
         mocked_create.return_value = self.functions
@@ -161,7 +185,7 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(a, b)
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testLocalModuleFunctionFailJson(self, mocked_create):
         mocked_create.return_value = Error('Error')
         
@@ -175,7 +199,7 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(a, b)
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testLocalModuleFunctionFailRaw(self, mocked_create):
         mocked_create.return_value = Error('Error')
         
@@ -212,7 +236,7 @@ class TestAWSFunctions(unittest.TestCase):
 # -----------------------------------------------------------------------------
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testRemoteRaw(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
         mocked_create.return_value = self.functions
@@ -229,7 +253,7 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(result['body'],'SUCCESS\nOK')
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testRemoteJson(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
         mocked_create.return_value = self.functions
@@ -249,7 +273,7 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(a, b)
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testRemoteModuleFunctionFailJson(self, mocked_create):
         mocked_create.return_value = Error('Error')
         
@@ -263,7 +287,7 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(a, b)
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testRemoteModuleFunctionFailRaw(self, mocked_create):
         mocked_create.return_value = Error('Error')
         
@@ -377,7 +401,7 @@ class TestAWSFunctions(unittest.TestCase):
 # -----------------------------------------------------------------------------
 
     
-    @patch('dynamicdns.aws.functions.__createAWSFunctions')
+    @patch('dynamicdns.aws.functions.createAWSFunctions')
     def testScript(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
         mocked_create.return_value = self.functions
@@ -395,7 +419,7 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(result['body'], 'SCRIPT')
 
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testScriptModuleFunctionFailJson(self, mocked_create):
         mocked_create.return_value = Error('Error')
         
@@ -409,7 +433,7 @@ class TestAWSFunctions(unittest.TestCase):
         b = json.loads('{ "status": "FAIL", "message": "Error" }')
         self.assertEqual(a, b)
 
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
     def testScriptModuleFunctionFailRaw(self, mocked_create):
         mocked_create.return_value = Error('Error')
         
