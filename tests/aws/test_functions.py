@@ -1,16 +1,18 @@
 import json
 import unittest
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import dynamicdns
 
+from dynamicdns.aws.functions import __createAWSFunctions 
+
 from dynamicdns.models import Error
-from dynamicdns.aws.functions import (AWSFunctions, Route53Provider, S3ConfigProvider)
+from dynamicdns.aws.functions import (AWSFunctions, Route53Provider, S3ConfigProvider, Boto3Wrapper)
 from dynamicdns.handler import Handler
 
 
-class TestAWSFunctionsInfo(unittest.TestCase):
+class TestAWSFunctions(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
@@ -39,6 +41,39 @@ class TestAWSFunctionsInfo(unittest.TestCase):
         '}')
         self.assertEqual(a, b)
 
+
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testVersionModuleFunctionSuccess(self, mocked_create):
+        self.__setUpMocks(hashFailed = False, updateFailed = False)        
+        mocked_create.return_value = self.functions
+
+        result = dynamicdns.aws.functions.version({},{})
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'application/json')
+        
+        a = json.loads(result['body'])
+        b = json.loads(
+        '{' + 
+            '"version": "' + dynamicdns.__version__ + '", ' + 
+            '"author": "' + dynamicdns.__author__ + '", ' + 
+            '"author-email": "' + dynamicdns.__author_email__ + '"' + 
+        '}')
+        self.assertEqual(a, b)
+
+
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testVersionModuleFunctionFail(self, mocked_create):
+        mocked_create.return_value = Error('Error')
+        
+        result = dynamicdns.aws.functions.version({},{})
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'application/json')
+        
+        a = json.loads(result['body'])
+        b = json.loads('{"status": "FAIL", "message": "Error"}')
+        self.assertEqual(a, b)
 
 # -----------------------------------------------------------------------------
 # INFO
