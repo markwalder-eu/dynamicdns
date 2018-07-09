@@ -20,15 +20,17 @@ class TestAWSFunctions(unittest.TestCase):
 # -----------------------------------------------------------------------------
 
     
-    def testVersion(self):
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testVersion(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
+        mocked_create.return_value = self.functions
         event = {
             'queryStringParameters': {},
             'requestContext': {}
         } 
         context = {}
 
-        result = self.functions.version(event, context)
+        result = dynamicdns.aws.functions.version(event, context)
 
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'application/json')
@@ -38,26 +40,6 @@ class TestAWSFunctions(unittest.TestCase):
             '"version": "' + dynamicdns.__version__ + '", ' + 
             '"author": "' + dynamicdns.__author__ + '", ' + 
             '"author-email": "' + dynamicdns.__author_email__ + '" ' +    
-        '}')
-        self.assertEqual(a, b)
-
-
-    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
-    def testVersionModuleFunctionSuccess(self, mocked_create):
-        self.__setUpMocks(hashFailed = False, updateFailed = False)        
-        mocked_create.return_value = self.functions
-
-        result = dynamicdns.aws.functions.version({},{})
-
-        self.assertEqual(result['statusCode'], 200)
-        self.assertEqual(result['headers']['Content-Type'], 'application/json')
-        
-        a = json.loads(result['body'])
-        b = json.loads(
-        '{' + 
-            '"version": "' + dynamicdns.__version__ + '", ' + 
-            '"author": "' + dynamicdns.__author__ + '", ' + 
-            '"author-email": "' + dynamicdns.__author_email__ + '"' + 
         '}')
         self.assertEqual(a, b)
 
@@ -75,20 +57,34 @@ class TestAWSFunctions(unittest.TestCase):
         b = json.loads('{"status": "FAIL", "message": "Error"}')
         self.assertEqual(a, b)
 
+
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testVersionModuleFunctionFailRaw(self, mocked_create):
+        mocked_create.return_value = Error('Error')
+        
+        result = dynamicdns.aws.functions.version({ 'queryStringParameters': { 'raw': ''} },{})
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'text/plain')        
+        self.assertEqual(result['body'], 'FAIL\nError')
+
+
 # -----------------------------------------------------------------------------
 # INFO
 # -----------------------------------------------------------------------------
 
     
-    def testInfo(self):
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testInfo(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
+        mocked_create.return_value = self.functions
         event = {
             'queryStringParameters': {},
             'requestContext': {}
         } 
         context = {}
 
-        result = self.functions.info(event, context)
+        result = dynamicdns.aws.functions.info(event, context)
 
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'application/json')
@@ -98,35 +94,64 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(a, b)
 
 
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testInfoModuleFunctionFail(self, mocked_create):
+        mocked_create.return_value = Error('Error')
+        
+        result = dynamicdns.aws.functions.info({},{})
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'application/json')
+        
+        a = json.loads(result['body'])
+        b = json.loads('{"status": "FAIL", "message": "Error"}')
+        self.assertEqual(a, b)
+
+
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testInfoModuleFunctionFailRaw(self, mocked_create):
+        mocked_create.return_value = Error('Error')
+        
+        result = dynamicdns.aws.functions.info({ 'queryStringParameters': { 'raw': ''} },{})
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'text/plain')        
+        self.assertEqual(result['body'], 'FAIL\nError')
+
+
 # -----------------------------------------------------------------------------
 # LOCAL
 # -----------------------------------------------------------------------------
 
 
-    def testLocalRaw(self):
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testLocalRaw(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
+        mocked_create.return_value = self.functions
         event = {
             'queryStringParameters': { 'raw': '' },
             'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
         } 
         context = {}
 
-        result = self.functions.local(event, context)
+        result = dynamicdns.aws.functions.local(event, context)
 
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'text/plain')
         self.assertEqual(result['body'],'SUCCESS\n1.1.1.1')
 
 
-    def testLocalJson(self):
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testLocalJson(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
+        mocked_create.return_value = self.functions
         event = {
             'queryStringParameters': {},
             'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
         } 
         context = {}
 
-        result = self.functions.local(event, context)
+        result = dynamicdns.aws.functions.local(event, context)
 
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'application/json')
@@ -134,6 +159,31 @@ class TestAWSFunctions(unittest.TestCase):
         a = json.loads(result['body'])
         b = json.loads('{ "status": "SUCCESS", "message": "1.1.1.1" }')
         self.assertEqual(a, b)
+
+
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testLocalModuleFunctionFail(self, mocked_create):
+        mocked_create.return_value = Error('Error')
+        
+        result = dynamicdns.aws.functions.local({},{})
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'application/json')
+        
+        a = json.loads(result['body'])
+        b = json.loads('{"status": "FAIL", "message": "Error"}')
+        self.assertEqual(a, b)
+
+
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testLocalModuleFunctionFailRaw(self, mocked_create):
+        mocked_create.return_value = Error('Error')
+        
+        result = dynamicdns.aws.functions.local({ 'queryStringParameters': { 'raw': ''} },{})
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'text/plain')        
+        self.assertEqual(result['body'], 'FAIL\nError')
 
 
     def testLocalMissingParamSourceIp(self):
@@ -162,30 +212,34 @@ class TestAWSFunctions(unittest.TestCase):
 # -----------------------------------------------------------------------------
 
 
-    def testRemoteRaw(self):
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testRemoteRaw(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
+        mocked_create.return_value = self.functions
         event = {
             'queryStringParameters': { 'raw': '', 'hostname': 'abc', 'hash': 'xyz', 'internalip': '2.2.2.2'},
             'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
         }
         context = {}
         
-        result = self.functions.remote(event, context)
+        result = dynamicdns.aws.functions.remote(event, context)
 
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'text/plain')
         self.assertEqual(result['body'],'SUCCESS\nOK')
 
 
-    def testRemoteJson(self):
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testRemoteJson(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
+        mocked_create.return_value = self.functions
         event = {
             'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz', 'internalip': '2.2.2.2'},
             'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
         }
         context = {}
         
-        result = self.functions.remote(event, context)
+        result = dynamicdns.aws.functions.remote(event, context)
 
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'application/json')
@@ -193,6 +247,31 @@ class TestAWSFunctions(unittest.TestCase):
         a = json.loads(result['body'])
         b = json.loads('{ "status": "SUCCESS", "message": "OK" }')
         self.assertEqual(a, b)
+
+
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testRemoteModuleFunctionFail(self, mocked_create):
+        mocked_create.return_value = Error('Error')
+        
+        result = dynamicdns.aws.functions.remote({},{})
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'application/json')
+        
+        a = json.loads(result['body'])
+        b = json.loads('{"status": "FAIL", "message": "Error"}')
+        self.assertEqual(a, b)
+
+
+    @patch('dynamicdns.aws.functions.__createAWSFunctions') 
+    def testRemoteModuleFunctionFailRaw(self, mocked_create):
+        mocked_create.return_value = Error('Error')
+        
+        result = dynamicdns.aws.functions.remote({ 'queryStringParameters': { 'raw': ''} },{})
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'text/plain')        
+        self.assertEqual(result['body'], 'FAIL\nError')
 
 
     def testRemoteMissingParamHostname(self):
