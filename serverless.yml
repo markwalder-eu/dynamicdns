@@ -39,32 +39,32 @@ provider:
 
 functions:
   version:
-    handler: dynamicdns/aws/functions.version
+    handler: dynamicdns/aws/functions/version.version
     events:
       - http:
           path: version
           method: get
   info:
-    handler: dynamicdns/aws/functions.info
+    handler: dynamicdns/aws/functions/info.info
     events:
       - http:
           path: info
           method: get
   local:
-    handler: dynamicdns/aws/functions.local
+    handler: dynamicdns/aws/functions/local.local
     events:
       - http:
           path: local
           method: get
   remote:
-    handler: dynamicdns/aws/functions.remote
+    handler: dynamicdns/aws/functions/remote.remote
     events:
       - http:
           path: remote
           method: post
 
   script:
-    handler: dynamicdns/aws/functions.script
+    handler: dynamicdns/aws/functions/script.script
     events:
       - http:
           path: script
