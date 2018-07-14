@@ -297,9 +297,30 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(result['headers']['Content-Type'], 'text/plain')        
         self.assertEqual(result['body'], 'FAIL\nError')
 
-
-    def testRemoteMissingParamHostname(self):
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
+    def testRemoteMissingParamInternalIp(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
+        mocked_create.return_value = self.functions
+        event = {
+            'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz'},
+            'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
+        }
+        context = {}
+        
+        result = dynamicdns.aws.functions.remote(event, context)
+
+        self.assertEqual(result['statusCode'], 200)
+        self.assertEqual(result['headers']['Content-Type'], 'application/json')
+
+        a = json.loads(result['body'])
+        b = json.loads('{ "status": "SUCCESS", "message": "OK" }')
+        self.assertEqual(a, b)
+
+
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
+    def testRemoteMissingParamHostname(self, mocked_create):
+        self.__setUpMocks(hashFailed=False, updateFailed=False)
+        mocked_create.return_value = self.functions
         event = {
             'queryStringParameters': { 'hash': 'xyz', 'internalip': '2.2.2.2'},
             'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
@@ -307,8 +328,10 @@ class TestAWSFunctions(unittest.TestCase):
         self.__remoteCaller(event, "You have to pass 'hostname' querystring parameters.")
 
 
-    def testRemoteMissingParamHash(self):
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
+    def testRemoteMissingParamHash(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
+        mocked_create.return_value = self.functions
         event = {
             'queryStringParameters': { 'hostname': 'abc', 'internalip': '2.2.2.2'},
             'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
@@ -316,26 +339,10 @@ class TestAWSFunctions(unittest.TestCase):
         self.__remoteCaller(event, "You have to pass 'hash' querystring parameters.")
 
 
-    def testRemoteMissingParamInternalIp(self):
+    @patch('dynamicdns.aws.functions.createAWSFunctions') 
+    def testRemoteMissingParamSourceIp(self, mocked_create):
         self.__setUpMocks(hashFailed=False, updateFailed=False)
-        event = {
-            'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz'},
-            'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
-        }
-        context = {}
-        
-        result = self.functions.remote(event, context)
-
-        self.assertEqual(result['statusCode'], 200)
-        self.assertEqual(result['headers']['Content-Type'], 'application/json')
-        
-        a = json.loads(result['body'])
-        b = json.loads('{ "status": "SUCCESS", "message": "OK" }')
-        self.assertEqual(a, b)
-
-
-    def testRemoteMissingParamSourceIp(self):
-        self.__setUpMocks(hashFailed=False, updateFailed=False)
+        mocked_create.return_value = self.functions
         event = {
             'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz', 'internalip': '2.2.2.2'}
         }
@@ -362,38 +369,20 @@ class TestAWSFunctions(unittest.TestCase):
 
     def testRemoteHashcheckFailed(self):
         self.__setUpMocks(hashFailed=True, updateFailed=False)
-        event = {
-            'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz', 'internalip': '2.2.2.2'},
-            'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
-        }
-        context = {}
-        
-        result = self.functions.remote(event, context)
 
-        self.assertEqual(result['statusCode'], 200)
-        self.assertEqual(result['headers']['Content-Type'], 'application/json')
-        
-        a = json.loads(result['body'])
-        b = json.loads('{ "status": "FAIL", "message": "Hashcheck failed" }')
-        self.assertEqual(a, b)
+        result = self.functions.remote('abc', 'xyz','1.1.1.1', '2.2.2.2', False)
+
+        self.assertTrue(isinstance(result, Error))
+        self.assertEqual(str(result), "Hashcheck failed")
 
 
     def testRemoteUpdateFailed(self):
         self.__setUpMocks(hashFailed=False, updateFailed=True)
-        event = {
-            'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz', 'internalip': '2.2.2.2'},
-            'requestContext': { 'identity': { 'sourceIp': '1.1.1.1' } }
-        }
-        context = {}
         
-        result = self.functions.remote(event, context)
+        result = self.functions.remote('abc', 'xyz', '1.1.1.1', '2.2.2.2', False)
 
-        self.assertEqual(result['statusCode'], 200)
-        self.assertEqual(result['headers']['Content-Type'], 'application/json')
-        
-        a = json.loads(result['body'])
-        b = json.loads('{ "status": "FAIL", "message": "Update failed" }')
-        self.assertEqual(a, b)
+        self.assertTrue(isinstance(result, Error))
+        self.assertEqual(str(result), "Update failed")
 
 
 # -----------------------------------------------------------------------------
@@ -497,7 +486,7 @@ class TestAWSFunctions(unittest.TestCase):
     def __remoteCaller(self, event, expMsg):
         context = {}
 
-        result = self.functions.remote(event, context)
+        result = dynamicdns.aws.functions.remote(event, context)
 
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'application/json')

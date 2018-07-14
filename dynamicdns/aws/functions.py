@@ -19,12 +19,14 @@ def version(event, context):
         return fail(error, raw)
     return fn.version(event, context)
 
+
 def info(event, context):
     fn = error = createAWSFunctions()
     if isinstance(error, Error):
         raw: bool = keyExists(event, 'queryStringParameters', 'raw')
         return fail(error, raw)
     return fn.info(event, context)
+
 
 def local(event, context):
     fn = error = createAWSFunctions()
@@ -33,12 +35,36 @@ def local(event, context):
         return fail(error, raw)
     return fn.local(event, context)
 
+
 def remote(event, context):
     fn = error = createAWSFunctions()
     if isinstance(error, Error):
         raw: bool = keyExists(event, 'queryStringParameters', 'raw')
         return fail(error, raw)
-    return fn.remote(event, context)
+
+    raw: bool = keyExists(event, 'queryStringParameters', 'raw')
+
+    if not keyExists(event, 'queryStringParameters', 'hostname'):
+        return fail(Error("You have to pass 'hostname' querystring parameters."), raw)
+    hostname: str = event['queryStringParameters']['hostname']
+
+    if not keyExists(event, 'queryStringParameters', 'hash'):
+        return fail(Error("You have to pass 'hash' querystring parameters."), raw)
+    validationhash: str = event['queryStringParameters']['hash']
+
+    if not keyExists(event, 'requestContext', 'identity', 'sourceIp'):
+        return fail(Error("Source IP address cannot be extracted from request context."), raw)
+    sourceip: str = event['requestContext']['identity']['sourceIp']
+
+    internalip: str = ""
+    if keyExists(event, 'queryStringParameters', 'internalip'):
+        internalip = event['queryStringParameters']['internalip']
+
+    result = error= fn.remote(hostname, validationhash, sourceip, internalip, raw)
+    if isinstance(error, Error):
+        return fail(str(error), raw)
+    return success(result, raw)
+
 
 def script(event, context):
     fn = error = createAWSFunctions()
@@ -83,6 +109,7 @@ class AWSFunctions:
         }
         return response 
 
+
     def info(self, event, context):
         return success(event, False)
 
@@ -99,37 +126,20 @@ class AWSFunctions:
         return success(sourceip, raw)
 
 
-    def remote(self, event, context):
-
-        raw: bool = keyExists(event, 'queryStringParameters', 'raw')
-
-        if not keyExists(event, 'queryStringParameters', 'hostname'):
-            return fail(Error("You have to pass 'hostname' querystring parameters."), raw)
-        hostname: str = event['queryStringParameters']['hostname']
-
-        if not keyExists(event, 'queryStringParameters', 'hash'):
-            return fail(Error("You have to pass 'hash' querystring parameters."), raw)
-        validationhash: str = event['queryStringParameters']['hash']
-
-        if not keyExists(event, 'requestContext', 'identity', 'sourceIp'):
-            return fail(Error("Source IP address cannot be extracted from request context."), raw)
-        sourceip: str = event['requestContext']['identity']['sourceIp']
-
-        internalip: str = ""
-        if keyExists(event, 'queryStringParameters', 'internalip'):
-            internalip = event['queryStringParameters']['internalip']
+    def remote(self, hostname, validationhash, sourceip, internalip, raw):
 
         sharedsecret: str = self.config.shared_secret(hostname)
 
         error = self.handler.checkhash(hostname, validationhash, sourceip, sharedsecret)
         if isinstance(error, Error):
-            return fail(error, raw)
+            return error
 
         result = error = self.handler.update(hostname, sourceip, internalip)
         if isinstance(error, Error):
-            return fail(error, raw)
+            return error
 
-        return success(result, raw)
+        return result
+
 
     def script(self, event, context):
         file = open("dynamicdns/scripts/dynamic-dns-client", "r") 
