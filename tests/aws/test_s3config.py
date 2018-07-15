@@ -4,6 +4,9 @@ import json
 from unittest.mock import MagicMock, patch
 
 from dynamicdns.models import ConfigProvider, Error
+
+from dynamicdns.aws import (boto3wrapper, s3config)
+
 from dynamicdns.aws.boto3wrapper import Boto3Wrapper
 from dynamicdns.aws.s3config import S3ConfigProvider
 
@@ -120,7 +123,7 @@ class TestS3ConfigProvider(unittest.TestCase):
 
 
     def __createConfigProvider(self, data, readException = False):
-        boto3_wrapper: Boto3Wrapper = Boto3Wrapper()
+        boto3_wrapper: Boto3Wrapper = boto3wrapper.factory()
         
         if readException:
             boto3_wrapper.client_get_object = MagicMock(side_effect=Exception('ReadException'))
@@ -130,4 +133,4 @@ class TestS3ConfigProvider(unittest.TestCase):
         boto3_wrapper.client_list_resource_record_sets = MagicMock(return_value=None)
         boto3_wrapper.client_change_resource_record_sets = MagicMock(return_value=None)
 
-        return S3ConfigProvider(boto3_wrapper)
+        return s3config.factory(boto3_wrapper)

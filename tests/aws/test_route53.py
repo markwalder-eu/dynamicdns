@@ -2,6 +2,9 @@ import unittest
 from unittest.mock import MagicMock
 
 from dynamicdns.models import DNSProvider, Error
+
+from dynamicdns.aws import (boto3wrapper, s3config, route53)
+
 from dynamicdns.aws.boto3wrapper import Boto3Wrapper
 from dynamicdns.aws.s3config import S3ConfigProvider
 from dynamicdns.aws.route53 import Route53Provider
@@ -115,7 +118,7 @@ class TestRoute53Provider(unittest.TestCase):
         self.assertEqual(str(result), 'Update of DNS record failed. Exception: UpdateException')
 
     def __createDNSProvider(self, data, readException = False, updateException = False):
-        boto3_wrapper: Boto3Wrapper = Boto3Wrapper()
+        boto3_wrapper: Boto3Wrapper = boto3wrapper.factory()
         boto3_wrapper.client_get_object = MagicMock(return_value=None)
         
         if readException:
@@ -128,14 +131,14 @@ class TestRoute53Provider(unittest.TestCase):
         else:
             boto3_wrapper.client_change_resource_record_sets = MagicMock(return_value=None)
 
-        config: S3ConfigProvider = S3ConfigProvider(None)
+        config: S3ConfigProvider = s3config.factory(None)
         config.aws_region = MagicMock(return_value='aws_region')
         config.route_53_record_ttl = MagicMock(return_value='route_53_record_ttl')
         config.route_53_record_type = MagicMock(return_value='route_53_record_type')
         config.route_53_zone_id = MagicMock(return_value='route_53_zone_id')
         config.shared_secret = MagicMock(return_value='shared_secret')
 
-        return Route53Provider(boto3_wrapper, config)
+        return route53.factory(boto3_wrapper, config)
 
 
 if __name__ == '__main__':

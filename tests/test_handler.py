@@ -1,8 +1,14 @@
 import unittest
 
+import dynamicdns
+
+from dynamicdns.aws import (s3config, route53)
+
 from dynamicdns.aws.s3config import S3ConfigProvider
 from dynamicdns.aws.route53 import Route53Provider
+
 from dynamicdns.models import Error
+
 from dynamicdns.handler import Handler
 
 from unittest.mock import MagicMock
@@ -114,11 +120,11 @@ class TestHandler(unittest.TestCase):
 
 
     def __setUpMocks(self, readReturnValue, updateReturnValue):
-        dns = Route53Provider(None, None)
+        dns = route53.factory(None, None)
         dns.read = MagicMock(return_value=readReturnValue)
         dns.update = MagicMock(return_value=updateReturnValue)
         
-        self.handler = Handler(dns)
+        self.handler = dynamicdns.handler.factory(dns)
 
 
 if __name__ == '__main__':
