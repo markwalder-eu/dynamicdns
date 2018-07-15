@@ -38,6 +38,21 @@ provider:
         - "arn:aws:route53:::hostedzone/*"
 
 functions:
+  test:
+    handler: dynamicdns/aws/functions/test.handle
+    events:
+      - http:
+          path: test/version
+          method: get
+      - http:
+          path: test/myip
+          method: get
+      - http:
+          path: test/dns
+          method: post
+      - http:
+          path: test/script
+          method: get
   version:
     handler: dynamicdns/aws/functions/version.handle
     events:
