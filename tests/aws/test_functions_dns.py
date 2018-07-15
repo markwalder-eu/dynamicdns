@@ -13,16 +13,16 @@ from dynamicdns.aws.route53 import Route53Provider
 from dynamicdns.aws.s3config import S3ConfigProvider
 from dynamicdns.aws.boto3wrapper import Boto3Wrapper
 
-from dynamicdns.handler import Handler
+from dynamicdns.processor import Processor
 
 
 class TestDNS(unittest.TestCase):
 
 
-    @patch('dynamicdns.handler.factory')
+    @patch('dynamicdns.processor.factory')
     @patch('dynamicdns.aws.s3config.factory')
-    def testDNSSuccess(self, mock_config, mock_handler):
-        self.__setUpMocks(configFailed=False, hashFailed=False, updateFailed=False, mock_config=mock_config, mock_handler=mock_handler)
+    def testDNSSuccess(self, mock_config, mock_processor):
+        self.__setUpMocks(configFailed=False, hashFailed=False, updateFailed=False, mock_config=mock_config, mock_processor=mock_processor)
 
         event = {
             'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz', 'internalip': '2.2.2.2'},
@@ -43,10 +43,10 @@ class TestDNS(unittest.TestCase):
         self.__checkRaw(result, "SUCCESS", "OK")
 
 
-    @patch('dynamicdns.handler.factory')
+    @patch('dynamicdns.processor.factory')
     @patch('dynamicdns.aws.s3config.factory')
-    def testDNSFailConfig(self, mock_config, mock_handler):
-        self.__setUpMocks(configFailed=True, hashFailed=False, updateFailed=False, mock_config=mock_config, mock_handler=mock_handler)
+    def testDNSFailConfig(self, mock_config, mock_processor):
+        self.__setUpMocks(configFailed=True, hashFailed=False, updateFailed=False, mock_config=mock_config, mock_processor=mock_processor)
         
         event = {
             'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz', 'internalip': '2.2.2.2'},
@@ -67,10 +67,10 @@ class TestDNS(unittest.TestCase):
         self.__checkRaw(result, "FAIL", "Config Load failed")
 
 
-    @patch('dynamicdns.handler.factory')
+    @patch('dynamicdns.processor.factory')
     @patch('dynamicdns.aws.s3config.factory')
-    def testDNSFailHashcheck(self, mock_config, mock_handler):
-        self.__setUpMocks(configFailed=False, hashFailed=True, updateFailed=False, mock_config=mock_config, mock_handler=mock_handler)
+    def testDNSFailHashcheck(self, mock_config, mock_processor):
+        self.__setUpMocks(configFailed=False, hashFailed=True, updateFailed=False, mock_config=mock_config, mock_processor=mock_processor)
 
         event = {
             'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz', 'internalip': '2.2.2.2'},
@@ -91,10 +91,10 @@ class TestDNS(unittest.TestCase):
         self.__checkRaw(result, "FAIL", "Hashcheck failed")
 
 
-    @patch('dynamicdns.handler.factory')
+    @patch('dynamicdns.processor.factory')
     @patch('dynamicdns.aws.s3config.factory')
-    def testDNSFailUpdate(self, mock_config, mock_handler):
-        self.__setUpMocks(configFailed=False, hashFailed=False, updateFailed=True, mock_config=mock_config, mock_handler=mock_handler)
+    def testDNSFailUpdate(self, mock_config, mock_processor):
+        self.__setUpMocks(configFailed=False, hashFailed=False, updateFailed=True, mock_config=mock_config, mock_processor=mock_processor)
 
         event = {
             'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz', 'internalip': '2.2.2.2'},
@@ -115,10 +115,10 @@ class TestDNS(unittest.TestCase):
         self.__checkRaw(result, "FAIL", "Update failed")
 
 
-    @patch('dynamicdns.handler.factory')
+    @patch('dynamicdns.processor.factory')
     @patch('dynamicdns.aws.s3config.factory')
-    def testDNSMissingParamInternalIp(self, mock_config, mock_handler):
-        self.__setUpMocks(configFailed=False, hashFailed=False, updateFailed=False, mock_config=mock_config, mock_handler=mock_handler)
+    def testDNSMissingParamInternalIp(self, mock_config, mock_processor):
+        self.__setUpMocks(configFailed=False, hashFailed=False, updateFailed=False, mock_config=mock_config, mock_processor=mock_processor)
 
         event = {
             'queryStringParameters': { 'hostname': 'abc', 'hash': 'xyz'},
@@ -139,10 +139,10 @@ class TestDNS(unittest.TestCase):
         self.__checkRaw(result, "SUCCESS", "OK")
 
 
-    @patch('dynamicdns.handler.factory')
+    @patch('dynamicdns.processor.factory')
     @patch('dynamicdns.aws.s3config.factory')
-    def testDNSMissingParamHostname(self, mock_config, mock_handler):
-        self.__setUpMocks(configFailed=False, hashFailed=False, updateFailed=False, mock_config=mock_config, mock_handler=mock_handler)
+    def testDNSMissingParamHostname(self, mock_config, mock_processor):
+        self.__setUpMocks(configFailed=False, hashFailed=False, updateFailed=False, mock_config=mock_config, mock_processor=mock_processor)
 
         event = {
             'queryStringParameters': { 'hash': 'xyz', 'internalip': '2.2.2.2'},
@@ -163,10 +163,10 @@ class TestDNS(unittest.TestCase):
         self.__checkRaw(result, "FAIL", "You have to pass 'hostname' querystring parameters.")
 
 
-    @patch('dynamicdns.handler.factory')
+    @patch('dynamicdns.processor.factory')
     @patch('dynamicdns.aws.s3config.factory')
-    def testDNSMissingParamHash(self, mock_config, mock_handler):
-        self.__setUpMocks(configFailed=False, hashFailed=False, updateFailed=False, mock_config=mock_config, mock_handler=mock_handler)
+    def testDNSMissingParamHash(self, mock_config, mock_processor):
+        self.__setUpMocks(configFailed=False, hashFailed=False, updateFailed=False, mock_config=mock_config, mock_processor=mock_processor)
  
         event = {
             'queryStringParameters': { 'hostname': 'abc', 'internalip': '2.2.2.2'},
@@ -187,10 +187,10 @@ class TestDNS(unittest.TestCase):
         self.__checkRaw(result, "FAIL", "You have to pass 'hash' querystring parameters.")
 
 
-    @patch('dynamicdns.handler.factory')
+    @patch('dynamicdns.processor.factory')
     @patch('dynamicdns.aws.s3config.factory')
-    def testDNSMissingParamSourceIp(self, mock_config, mock_handler):
-        self.__setUpMocks(configFailed=False, hashFailed=False, updateFailed=False, mock_config=mock_config, mock_handler=mock_handler)
+    def testDNSMissingParamSourceIp(self, mock_config, mock_processor):
+        self.__setUpMocks(configFailed=False, hashFailed=False, updateFailed=False, mock_config=mock_config, mock_processor=mock_processor)
 
 
         event = {
@@ -265,7 +265,7 @@ class TestDNS(unittest.TestCase):
 # TESTING HELPER METHODS
 # -----------------------------------------------------------------------------
 
-    def __setUpMocks(self, configFailed: bool, hashFailed: bool, updateFailed: bool, mock_config, mock_handler):
+    def __setUpMocks(self, configFailed: bool, hashFailed: bool, updateFailed: bool, mock_config, mock_processor):
 
         config = S3ConfigProvider(None)
 
@@ -282,18 +282,18 @@ class TestDNS(unittest.TestCase):
 
         mock_config.return_value = config
 
-        handler = Handler(None)
+        processor = Processor(None)
         if hashFailed:
-            handler.checkhash = MagicMock(return_value = Error("Hashcheck failed"))
+            processor.checkhash = MagicMock(return_value = Error("Hashcheck failed"))
         else:
-            handler.checkhash = MagicMock(return_value = None)
+            processor.checkhash = MagicMock(return_value = None)
         
         if updateFailed:
-            handler.update = MagicMock(return_value = Error("Update failed"))
+            processor.update = MagicMock(return_value = Error("Update failed"))
         else:
-            handler.update = MagicMock(return_value = "OK")
+            processor.update = MagicMock(return_value = "OK")
 
-        mock_handler.return_value = handler
+        mock_processor.return_value = processor
 
     def __checkJson(self, result, status, message):
         self.assertEqual(result['statusCode'], 200)

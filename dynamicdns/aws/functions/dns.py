@@ -2,7 +2,7 @@ import os
 import json
 
 from dynamicdns.models import Error, ConfigProvider, DNSProvider
-from dynamicdns.handler import Handler
+from dynamicdns.processor import Processor
 from dynamicdns.util import success, fail, keyExists
 
 import dynamicdns
@@ -50,18 +50,18 @@ def handle(event, context):
     
     # Route 53 - Read / write DNS entry 
     dns: DNSProvider = route53.factory(boto3_wrapper, config)
-    handler = dynamicdns.handler.factory(dns)
+    processor = dynamicdns.processor.factory(dns)
 
     # Get shared secret from S3 bucket 
     sharedsecret: str = config.shared_secret(hostname)
 
     # Check passed hash value 
-    error = handler.checkhash(hostname, validationhash, sourceip, sharedsecret)
+    error = processor.checkhash(hostname, validationhash, sourceip, sharedsecret)
     if isinstance(error, Error):
         return fail(str(error), raw)
 
     # Update entry on Route 53 
-    result = error = handler.update(hostname, sourceip, internalip)
+    result = error = processor.update(hostname, sourceip, internalip)
     if isinstance(error, Error):
         return fail(str(error), raw)
 

@@ -27,6 +27,7 @@ def success(message: str, raw: bool):
         }
     return response
 
+
 def fail(error: str, raw: bool):
     if raw:
         headers = {
@@ -52,6 +53,7 @@ def fail(error: str, raw: bool):
             "body": json.dumps(body)
         }
     return response
+
 
 def keyExists(element, *keys):
     _element = element

@@ -16,6 +16,7 @@ class ConfigProvider:
     def shared_secret(self, hostname: str):
         raise NotImplementedError("Subclass must implement abstract method")
 
+
 class DNSProvider:
 
     def read(self, hostname: str):

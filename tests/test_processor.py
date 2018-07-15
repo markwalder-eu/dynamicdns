@@ -9,13 +9,13 @@ from dynamicdns.aws.route53 import Route53Provider
 
 from dynamicdns.models import Error
 
-from dynamicdns.handler import Handler
+from dynamicdns.processor import Processor
 
 from unittest.mock import MagicMock
 
 import hashlib
 
-class TestHandler(unittest.TestCase):
+class TestProcessor(unittest.TestCase):
     
 
     def testCheckhash(self):
@@ -26,7 +26,7 @@ class TestHandler(unittest.TestCase):
         sourceip = "1.1.1.1"
         sharedsecret = "1234567890"
 
-        result = self.handler.checkhash(hostname, validationhash, sourceip, sharedsecret)
+        result = self.processor.checkhash(hostname, validationhash, sourceip, sharedsecret)
 
         self.assertFalse(isinstance(result, Error))
 
@@ -39,7 +39,7 @@ class TestHandler(unittest.TestCase):
         sourceip = "1.1.1.1"
         sharedsecret = "1234567890"
 
-        result = self.handler.checkhash(hostname, validationhash, sourceip, sharedsecret)
+        result = self.processor.checkhash(hostname, validationhash, sourceip, sharedsecret)
 
         self.assertTrue(isinstance(result, Error))
         self.assertEqual(str(result), "You must pass a valid sha256 hash in the hash= querystring parameter.")
@@ -53,7 +53,7 @@ class TestHandler(unittest.TestCase):
         sourceip = "1.1.1.1"
         sharedsecret = "1234567890"
 
-        result = self.handler.checkhash(hostname, validationhash, sourceip, sharedsecret)
+        result = self.processor.checkhash(hostname, validationhash, sourceip, sharedsecret)
 
         self.assertTrue(isinstance(result, Error))
         self.assertEqual(str(result), "Validation of hashes failed.")
@@ -66,7 +66,7 @@ class TestHandler(unittest.TestCase):
         sourceip = "1.1.1.1"
         internalip = ""
         
-        result = self.handler.update(hostname, sourceip, internalip)
+        result = self.processor.update(hostname, sourceip, internalip)
 
         self.assertEqual(str(result), "Your IP '1.1.1.1' address matches the current DNS record for 'host.domain.com'.")
 
@@ -78,7 +78,7 @@ class TestHandler(unittest.TestCase):
         sourceip = "1.1.1.1"
         internalip = ""
         
-        result = self.handler.update(hostname, sourceip, internalip)
+        result = self.processor.update(hostname, sourceip, internalip)
 
         self.assertEqual(str(result), "Your hostname record 'host.domain.com' has been updated from '2.2.2.2' to '1.1.1.1'.")
 
@@ -90,7 +90,7 @@ class TestHandler(unittest.TestCase):
         sourceip = "1.1.1.1"
         internalip = ""
         
-        result = self.handler.update(hostname, sourceip, internalip)
+        result = self.processor.update(hostname, sourceip, internalip)
 
         self.assertTrue(isinstance(result, Error))
         self.assertEqual(str(result), "Read failed")
@@ -103,7 +103,7 @@ class TestHandler(unittest.TestCase):
         sourceip = "1.1.1.1"
         internalip = ""
         
-        result = self.handler.update(hostname, sourceip, internalip)
+        result = self.processor.update(hostname, sourceip, internalip)
 
         self.assertTrue(isinstance(result, Error))
         self.assertEqual(str(result), "Write failed")
@@ -116,7 +116,7 @@ class TestHandler(unittest.TestCase):
         sourceip = "1.1.1.1"
         internalip = "3.3.3.3"
         
-        result = self.handler.update(hostname, sourceip, internalip)
+        result = self.processor.update(hostname, sourceip, internalip)
 
         self.assertEqual(str(result), "Your hostname record 'host.domain.com' has been updated from '2.2.2.2' to '3.3.3.3'.")
 
@@ -126,7 +126,7 @@ class TestHandler(unittest.TestCase):
         dns.read = MagicMock(return_value=readReturnValue)
         dns.update = MagicMock(return_value=updateReturnValue)
         
-        self.handler = dynamicdns.handler.factory(dns)
+        self.processor = dynamicdns.processor.factory(dns)
 
 
 if __name__ == '__main__':

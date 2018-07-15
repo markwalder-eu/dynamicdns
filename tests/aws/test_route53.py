@@ -125,7 +125,7 @@ class TestRoute53Provider(unittest.TestCase):
         self.assertTrue(isinstance(error, Error))
         self.assertEqual(str(result), 'Update of DNS record failed. Exception: UpdateException')
 
-  
+
     def __createDNSProvider(self, data, readException = False, updateException = False):
         boto3_wrapper: Boto3Wrapper = boto3wrapper.factory()
         boto3_wrapper.client_get_object = MagicMock(return_value=None)

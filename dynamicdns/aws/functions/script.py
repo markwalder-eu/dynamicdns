@@ -15,4 +15,3 @@ def handle(event, context):
         "body": body
     }
     return response
- 

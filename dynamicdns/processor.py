@@ -5,10 +5,10 @@ from dynamicdns.models import Error, ConfigProvider, DNSProvider
 
 
 def factory(dns: DNSProvider):
-    return Handler(dns)
+    return Processor(dns)
 
 
-class Handler:
+class Processor:
 
     def __init__(self, dns: DNSProvider):
         self.dns = dns
