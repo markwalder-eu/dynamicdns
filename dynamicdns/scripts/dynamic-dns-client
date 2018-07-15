@@ -56,8 +56,8 @@ if [ "${url: -1}" == "/" ]; then
     url="${url:0:-1}"
 fi
 
-sourceip_url="dynamicdns-v1/local"
-remoteip_url="dynamicdns-v1/remote"
+myip_url="dynamicdns-v1/myip"
+dns_url="dynamicdns-v1/dns"
 
 # -----------------------------------------------------------------------------
 # Header
@@ -66,9 +66,9 @@ echo "$(date) - Dynamic DNS Update Utility"
 
 
 # -----------------------------------------------------------------------------
-# Source IP
+# Get My IP
 
-response=$(curl -w \\n%{http_code} -s -q "$url/$sourceip_url?raw")
+response=$(curl -w \\n%{http_code} -s -q "$url/$myip_url?raw")
 
 http_status=$(echo "$response" | tail -n1)
 tmp=$(echo "$response" | head -n-1)
@@ -76,19 +76,19 @@ fn_status=$(echo "$tmp" | head -n1)
 fn_message=$(echo "$tmp" | tail -n1)
 
 if [ $http_status != 200 ] || [ "$fn_status" != "SUCCESS" ]; then
-    echo "- Get Source IP: FAILED  <-- $fn_message"
+    echo "- Get My IP: FAILED  <-- $fn_message"
     exit 1
 fi
-echo "- Get Source IP: SUCCESS <-- $fn_message"
+echo "- Get My IP: SUCCESS <-- $fn_message"
 
 
 # -----------------------------------------------------------------------------
-# Remote IP
+# Update DNS Server
 
-sourceip=$fn_message
-hash=$(echo -n $sourceip$hostname$sharedsecret | shasum -a 256 | awk '{print $1}')
+myip=$fn_message
+hash=$(echo -n $myip$hostname$sharedsecret | shasum -a 256 | awk '{print $1}')
 
-response=$(curl -w \\n%{http_code} -X POST -s -q "$url/$remoteip_url?raw&hostname=$hostname&${internalip}hash=$hash")
+response=$(curl -w \\n%{http_code} -X POST -s -q "$url/$dns_url?raw&hostname=$hostname&${internalip}hash=$hash")
 
 http_status=$(echo "$response" | tail -n1)
 tmp=$(echo "$response" | head -n-1)
@@ -96,10 +96,10 @@ fn_status=$(echo "$tmp" | head -n1)
 fn_message=$(echo "$tmp" | tail -n1)
 
 if [ $http_status != 200 ] || [ "$fn_status" != "SUCCESS" ]; then
-    echo "- Set Remote IP: FAILED  <-- $fn_message"
+    echo "- Update DNS Server: FAILED  <-- $fn_message"
     exit 1
 fi
-echo "- Set Remote IP: SUCCESS <-- $fn_message"
+echo "- Update DNS Server: SUCCESS <-- $fn_message"
 
 
 # -----------------------------------------------------------------------------

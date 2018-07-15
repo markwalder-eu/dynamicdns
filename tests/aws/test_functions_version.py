@@ -3,10 +3,10 @@ import unittest
 
 import dynamicdns
 
-from dynamicdns.aws.functions.version import version 
+from dynamicdns.aws.functions.version import handle 
 
 
-class TestAWSFunctions(unittest.TestCase):
+class TestVersion(unittest.TestCase):
 
     
     def testVersion(self):
@@ -16,7 +16,7 @@ class TestAWSFunctions(unittest.TestCase):
         } 
         context = {}
 
-        result = version(event, context)
+        result = handle(event, context)
 
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'application/json')

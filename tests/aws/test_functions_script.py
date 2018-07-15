@@ -2,10 +2,10 @@ import unittest
 
 from unittest.mock import patch, mock_open
 
-from dynamicdns.aws.functions.script import script 
+from dynamicdns.aws.functions.script import handle 
 
 
-class TestAWSFunctions(unittest.TestCase):
+class TestScript(unittest.TestCase):
 
     
     def testScript(self):
@@ -16,7 +16,7 @@ class TestAWSFunctions(unittest.TestCase):
         context = {}
 
         with patch('builtins.open', mock_open(read_data='SCRIPT')):
-            result = script(event, context)
+            result = handle(event, context)
         
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'text/plain')

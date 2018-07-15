@@ -4,6 +4,7 @@ from dynamicdns.models import ConfigProvider, DNSProvider
 
 class TestModels(unittest.TestCase):
     
+    
     def testConfigProvider(self):
 
         class ConfigProviderTest(ConfigProvider):

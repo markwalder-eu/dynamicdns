@@ -14,7 +14,7 @@ from dynamicdns.aws.s3config import S3ConfigProvider
 from dynamicdns.aws.route53 import Route53Provider
 
 
-def remote(event, context):
+def handle(event, context):
     
     # Extract Raw Parameter 
     raw: bool = keyExists(event, 'queryStringParameters', 'raw')

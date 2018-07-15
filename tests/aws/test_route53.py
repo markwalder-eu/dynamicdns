@@ -12,6 +12,7 @@ from dynamicdns.aws.route53 import Route53Provider
 
 class TestRoute53Provider(unittest.TestCase):
 
+
     def testReadHostnameWithoutDot(self):
         dns = self.__createDNSProvider(
         { 'ResourceRecordSets':
@@ -28,6 +29,7 @@ class TestRoute53Provider(unittest.TestCase):
         self.assertFalse(isinstance(error, Error))
         self.assertEqual(result, 'test-value')
 
+
     def testReadHostnameWithDot(self):
         dns = self.__createDNSProvider(
         { 'ResourceRecordSets':
@@ -43,6 +45,7 @@ class TestRoute53Provider(unittest.TestCase):
 
         self.assertFalse(isinstance(error, Error))
         self.assertEqual(result, 'test-value')
+
 
     def testReadMultipleValues(self):
         dns = self.__createDNSProvider(
@@ -61,6 +64,7 @@ class TestRoute53Provider(unittest.TestCase):
         self.assertTrue(isinstance(error, Error))
         self.assertEqual(str(result), 'You should only have a single value for your dynamic record. You currently have more than one.')
 
+
     def testReadNotFound(self):
         dns = self.__createDNSProvider(
         { 'ResourceRecordSets':
@@ -77,6 +81,7 @@ class TestRoute53Provider(unittest.TestCase):
         self.assertFalse(isinstance(error, Error))
         self.assertEqual(result, '')
 
+
     def testReadEmpty1(self):
         dns = self.__createDNSProvider({'ResourceRecordSets':[]})
 
@@ -84,6 +89,7 @@ class TestRoute53Provider(unittest.TestCase):
 
         self.assertFalse(isinstance(error, Error))
         self.assertEqual(result, '')
+
 
     def testReadEmpty2(self):
         dns = self.__createDNSProvider({})
@@ -93,6 +99,7 @@ class TestRoute53Provider(unittest.TestCase):
         self.assertTrue(isinstance(error, Error))
         self.assertEqual(str(result), 'Retrieval of current ip address failed. Excpeption: \'ResourceRecordSets\'')
 
+
     def testReadException(self):
         dns = self.__createDNSProvider({}, readException = True)
         
@@ -100,6 +107,7 @@ class TestRoute53Provider(unittest.TestCase):
 
         self.assertTrue(isinstance(error, Error))
         self.assertEqual(str(result), 'Retrieval of current ip address failed. Excpeption: ReadException')
+
 
     def testUpdate(self):
         dns = self.__createDNSProvider({})
@@ -117,6 +125,7 @@ class TestRoute53Provider(unittest.TestCase):
         self.assertTrue(isinstance(error, Error))
         self.assertEqual(str(result), 'Update of DNS record failed. Exception: UpdateException')
 
+  
     def __createDNSProvider(self, data, readException = False, updateException = False):
         boto3_wrapper: Boto3Wrapper = boto3wrapper.factory()
         boto3_wrapper.client_get_object = MagicMock(return_value=None)

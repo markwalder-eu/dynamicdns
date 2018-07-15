@@ -2,7 +2,7 @@ from dynamicdns.models import Error
 from dynamicdns.util import success, fail, keyExists
 
 
-def local(event, context):
+def handle(event, context):
 
     raw: bool = keyExists(event, 'queryStringParameters', 'raw')
     

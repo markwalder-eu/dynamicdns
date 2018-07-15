@@ -17,6 +17,7 @@ import hashlib
 
 class TestHandler(unittest.TestCase):
     
+
     def testCheckhash(self):
         self.__setUpMocks(None, None)
 
@@ -106,6 +107,7 @@ class TestHandler(unittest.TestCase):
 
         self.assertTrue(isinstance(result, Error))
         self.assertEqual(str(result), "Write failed")
+
 
     def testUpdateWithInternalIp(self):
         self.__setUpMocks("2.2.2.2", "3.3.3.3")

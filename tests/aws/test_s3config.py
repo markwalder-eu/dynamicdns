@@ -13,6 +13,7 @@ from dynamicdns.aws.s3config import S3ConfigProvider
 
 class TestS3ConfigProvider(unittest.TestCase):
 
+
     def testReadProps(self):
         config: S3ConfigProvider = self.__createConfigProvider(
         {   "hostname": {
@@ -83,6 +84,7 @@ class TestS3ConfigProvider(unittest.TestCase):
             self.assertFalse(isinstance(result, Error))
             with self.assertRaises(Exception):
                 config.aws_region('hostname')
+
 
     def testReadException(self):
         config: S3ConfigProvider = self.__createConfigProvider(None, readException=True)

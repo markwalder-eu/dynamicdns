@@ -1,13 +1,13 @@
 import json
 import unittest
 
-from dynamicdns.aws.functions.local import (local) 
+from dynamicdns.aws.functions.myip import handle 
 
 
-class TestAWSFunctions(unittest.TestCase):
+class testMyIP(unittest.TestCase):
 
 
-    def testLocal(self):
+    def testMyIP(self):
 
         event = {
             'queryStringParameters': { 'raw': '' },
@@ -15,7 +15,7 @@ class TestAWSFunctions(unittest.TestCase):
         } 
         context = {}
 
-        result = local(event, context)
+        result = handle(event, context)
 
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'text/plain')
@@ -28,7 +28,7 @@ class TestAWSFunctions(unittest.TestCase):
         } 
         context = {}
 
-        result = local(event, context)
+        result = handle(event, context)
 
         self.assertEqual(result['statusCode'], 200)
         self.assertEqual(result['headers']['Content-Type'], 'application/json')
@@ -38,31 +38,31 @@ class TestAWSFunctions(unittest.TestCase):
         self.assertEqual(a, b)
 
 
-    def testLocalMissingParamSourceIp(self):
+    def testMyIPMissingParamSourceIp(self):
         event = { 'queryStringParameters': { 'raw': '' } } 
-        self.__localCaller(event, True)
+        self.__myIPCaller(event, True)
         event = {} 
-        self.__localCaller(event, False)
+        self.__myIPCaller(event, False)
 
         event = { 'queryStringParameters': { 'raw': '' }, 'requestContext': {} } 
-        self.__localCaller(event, True)
+        self.__myIPCaller(event, True)
         event = { 'requestContext': {} } 
-        self.__localCaller(event, False)
+        self.__myIPCaller(event, False)
 
         event = { 'queryStringParameters': { 'raw': '' }, 'requestContext': None } 
-        self.__localCaller(event, True)
+        self.__myIPCaller(event, True)
         event = { 'requestContext': None } 
-        self.__localCaller(event, False)
+        self.__myIPCaller(event, False)
 
         event = { 'queryStringParameters': { 'raw': '' }, 'requestContext': { 'identity': {} } } 
-        self.__localCaller(event, True)
+        self.__myIPCaller(event, True)
         event = { 'requestContext': { 'identity': {} } } 
-        self.__localCaller(event, False)
+        self.__myIPCaller(event, False)
 
         event = { 'queryStringParameters': { 'raw': '' }, 'requestContext': { 'identity': None } } 
-        self.__localCaller(event, True)
+        self.__myIPCaller(event, True)
         event = { 'queryStringParameters': {}, 'requestContext': { 'identity': None } }
-        self.__localCaller(event, False)
+        self.__myIPCaller(event, False)
 
 
 # -----------------------------------------------------------------------------
@@ -70,10 +70,10 @@ class TestAWSFunctions(unittest.TestCase):
 # -----------------------------------------------------------------------------
 
 
-    def __localCaller(self, event, raw):
+    def __myIPCaller(self, event, raw):
         context = {}
 
-        result = local(event, context)
+        result = handle(event, context)
 
         if raw:
             self.assertEqual(result['statusCode'], 200)

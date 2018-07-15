@@ -3,7 +3,7 @@ import json
 import dynamicdns
 
 
-def version(event, context):
+def handle(event, context):
     headers = {
             "Content-Type": "application/json"
     }

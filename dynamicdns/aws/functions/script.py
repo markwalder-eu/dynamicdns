@@ -1,6 +1,6 @@
 
 
-def script(event, context):
+def handle(event, context):
     file = open("dynamicdns/scripts/dynamic-dns-client", "r") 
     content = file.read()
     file.close()
