@@ -4,6 +4,10 @@ import hashlib
 from dynamicdns.models import Error, ConfigProvider, DNSProvider
 
 
+def factory(dns: DNSProvider):
+    return Handler(dns)
+
+
 class Handler:
 
     def __init__(self, dns: DNSProvider):

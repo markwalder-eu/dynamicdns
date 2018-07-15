@@ -5,6 +5,10 @@ from dynamicdns.models import Error, ConfigProvider, DNSProvider
 from dynamicdns.handler import Handler
 from dynamicdns.util import success, fail, keyExists
 
+import dynamicdns
+
+from dynamicdns.aws import (s3config, route53, boto3wrapper)
+
 from dynamicdns.aws.boto3wrapper import Boto3Wrapper
 from dynamicdns.aws.s3config import S3ConfigProvider
 from dynamicdns.aws.route53 import Route53Provider
@@ -12,12 +16,6 @@ from dynamicdns.aws.route53 import Route53Provider
 
 def remote(event, context):
     
-    # Create AWS Functions Object  
-    fn = error = createAWSFunctions()
-    if isinstance(error, Error):
-        raw: bool = keyExists(event, 'queryStringParameters', 'raw')
-        return fail(error, raw)
-
     # Extract Raw Parameter 
     raw: bool = keyExists(event, 'queryStringParameters', 'raw')
 
@@ -41,42 +39,31 @@ def remote(event, context):
     if keyExists(event, 'queryStringParameters', 'internalip'):
         internalip = event['queryStringParameters']['internalip']
 
-    # Execute Remote Function 
-    result = error= fn.remote(hostname, validationhash, sourceip, internalip, raw)
-    if isinstance(error, Error):
-        return fail(str(error), raw)
-    return success(result, raw)
- 
- 
-def createAWSFunctions():
-    boto3_wrapper = Boto3Wrapper()
-    config: ConfigProvider = S3ConfigProvider(boto3_wrapper)
+    # Boto3 Wrapper - Utility for reading / writing AWS objects
+    boto3_wrapper: Boto3Wrapper = boto3wrapper.factory()
+
+    # S3 Configuration - Read settings from a S3 bucket
+    config: ConfigProvider = s3config.factory(boto3_wrapper)
     error = config.load()
     if isinstance(error, Error):
-        return error
-    dns: DNSProvider = Route53Provider(boto3_wrapper, config)
-    handler: Handler = Handler(dns)
-    return AWSFunctions(config, dns, handler)
+        return fail(str(error), raw)
+    
+    # Route 53 - Read / write DNS entry 
+    dns: DNSProvider = route53.factory(boto3_wrapper, config)
+    handler = dynamicdns.handler.factory(dns)
 
+    # Get shared secret from S3 bucket 
+    sharedsecret: str = config.shared_secret(hostname)
 
-class AWSFunctions:
+    # Check passed hash value 
+    error = handler.checkhash(hostname, validationhash, sourceip, sharedsecret)
+    if isinstance(error, Error):
+        return fail(str(error), raw)
 
-    def __init__(self, config: ConfigProvider, dns: DNSProvider, handler: Handler):
-        self.config = config
-        self.dns = dns
-        self.handler = handler
+    # Update entry on Route 53 
+    result = error = handler.update(hostname, sourceip, internalip)
+    if isinstance(error, Error):
+        return fail(str(error), raw)
 
-
-    def remote(self, hostname, validationhash, sourceip, internalip, raw):
-
-        sharedsecret: str = self.config.shared_secret(hostname)
-
-        error = self.handler.checkhash(hostname, validationhash, sourceip, sharedsecret)
-        if isinstance(error, Error):
-            return error
-
-        result = error = self.handler.update(hostname, sourceip, internalip)
-        if isinstance(error, Error):
-            return error
-
-        return result
+    # Return status success 
+    return success(result, raw)

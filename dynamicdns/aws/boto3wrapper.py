@@ -2,6 +2,10 @@ import json
 import boto3
 
 
+def factory():
+    return Boto3Wrapper()
+
+
 class Boto3Wrapper():
     
     def client_get_object(self, region, bucket, key):

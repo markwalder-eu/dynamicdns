@@ -4,6 +4,11 @@ import os
 from dynamicdns.models import Error, ConfigProvider
 from dynamicdns.aws.boto3wrapper import Boto3Wrapper
 
+
+def factory(boto3_wrapper: Boto3Wrapper):
+    return S3ConfigProvider(boto3_wrapper)
+
+
 class S3ConfigProvider(ConfigProvider):
 
     def __init__(self, boto3_wrapper: Boto3Wrapper):

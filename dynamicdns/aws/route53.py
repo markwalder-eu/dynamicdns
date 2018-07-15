@@ -4,6 +4,10 @@ from dynamicdns.aws.s3config import S3ConfigProvider
 from dynamicdns.aws.boto3wrapper import Boto3Wrapper
 
 
+def factory(boto3_wrapper: Boto3Wrapper, config: ConfigProvider):
+    return Route53Provider(boto3_wrapper, config)
+
+
 class Route53Provider(DNSProvider):
 
     def __init__(self, boto3_wrapper: Boto3Wrapper, config: S3ConfigProvider):
