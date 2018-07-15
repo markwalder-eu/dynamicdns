@@ -6,13 +6,8 @@ def execute(resource: str, method: str, event: dict, context: dict):
     return  {   "/dns|POST":        dns.handle,
                 "/myip|GET":        myip.handle,
                 "/script|GET":      script.handle,
-                "/version|GET":     version.handle,
-                "/info|GET":        info,
+                "/version|GET":     version.handle
             }.get(resource + "|" + method, executefail)(event, context)
-
-
-def info(event: dict, context: dict):
-    return success(event, False)
 
 
 def executefail(event: dict, context: dict):
