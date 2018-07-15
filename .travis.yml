@@ -8,6 +8,7 @@ install:
   - pip-sync requirements.txt requirements-dev.txt
   - npm install -g serverless
   - npm install
+  - git diff package-lock.json
   - git checkout -- package-lock.json
 
 script:
