@@ -44,12 +44,6 @@ functions:
       - http:
           path: version
           method: get
-  info:
-    handler: dynamicdns/aws/functions/info.info
-    events:
-      - http:
-          path: info
-          method: get
   local:
     handler: dynamicdns/aws/functions/local.local
     events:
