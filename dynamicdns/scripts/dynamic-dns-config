@@ -73,7 +73,8 @@ type sed    >/dev/null 2>&1 || { echo >&2 "I require 'sed' but it's not installe
 SILENT=no
 while [ "$1" != "" ]; do
     case $1 in
-        --silent )                      SILENT=yes
+        --silent )                      shift
+                                        SILENT=yes
                                         ;;
         --stage )                       shift
                                         STAGE=$1
