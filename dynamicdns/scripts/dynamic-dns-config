@@ -1,22 +1,48 @@
 #!/bin/bash
 
 usage() {
-    echo "Usage: create-config [OPTION]"
+    echo "Usage: dynamic-dns-config [OPTION]"
     echo "Create configuration files for Dynamic DNS Utility"
     echo ""
-    echo "--silent"
-    echo "--stage <stage>"
-    echo "--hostname <hostname>"
-    echo "--shared-secret <shared secret>"
-    echo "--api-domain-name <API domain name>"
-    echo "--api-domain-certificate-name <API domain certificate name>"
-    echo "--route53-region <Route53 - Region>"
-    echo "--route53-zone-id <Route53 - Zone ID>"
-    echo "--route53-record-ttl <Route53 - Record TTL>"
-    echo "--route53-record-type <Route53 - Record Type>"
-    echo "--s3-region <S3 - Region>"
-    echo "--s3-bucket <S3 - Bucket>"
-    echo "--s3-key <S3 - Key>" 
+    echo "  --silent"
+    echo "    Silent installation, parameters are passed via command line or environment variables."
+    echo ""
+    echo "  --stage <stage>"
+    echo "    Stage name used in configuration files and afterwards on AWS."
+    echo ""
+    echo "  --hostname <hostname>"
+    echo "    Hostname used to update / create on AWS (Route 53)."
+    echo ""
+    echo "  --shared-secret <shared secret>"
+    echo "    Shared secret used to hash the parameters and check during communication."
+    echo ""
+    echo "  --api-domain-name <API domain name>"
+    echo "    Domain name including host to use for Cloudfront e.g. api.domain.com."
+    echo ""
+    echo "  --api-domain-certificate-name <API domain certificate name>"
+    echo "    SSL certificate name used for https on AWS."
+    echo "    IMPORTANT: Generated certificate name has to match the API domain name, otherwise the certificate won't be accepted."
+    echo ""
+    echo "  --route53-region <Route 53 - region>"
+    echo "    Route 53 region where your DNS domain is located."
+    echo ""
+    echo "  --route53-zone-id <Route 53 - zone id>"
+    echo "    Route 53 zone id which will be updated and where your hostname to update will be located."
+    echo ""
+    echo "  --route53-record-ttl <Route 53 - record ttl>"
+    echo "    Route 53 record time to live (ttl) to be used."
+    echo ""
+    echo "  --route53-record-type <Route 53 - record type>"
+    echo "    Route 53 record type to be used (most of the time this will be A)."
+    echo ""
+    echo "  --s3-region <S3 - Region>"
+    echo "    S3 region where your S3 configuration bucket is located."
+    echo ""
+    echo "  --s3-bucket <S3 - Bucket>"
+    echo "    S3 bucket where your configuration file is found."
+    echo ""
+    echo "  --s3-key <S3 - Key>" 
+    echo "    S3 key where your configuration file is found."
     echo ""   
     exit
 }
@@ -47,8 +73,7 @@ type sed    >/dev/null 2>&1 || { echo >&2 "I require 'sed' but it's not installe
 SILENT=no
 while [ "$1" != "" ]; do
     case $1 in
-        --silent )                      shift
-                                        SILENT=yes
+        --silent )                      SILENT=yes
                                         ;;
         --stage )                       shift
                                         STAGE=$1
@@ -95,6 +120,11 @@ while [ "$1" != "" ]; do
 done
 
 if [ "$SILENT" == "no" ]; then
+    echo ""
+    echo ""
+    echo "= Enter Configuration Values"
+    echo "==============================================================================="
+    echo ""
     read -p "Stage                          : " STAGE
     read -p "Hostname                       : " DNS_HOSTNAME
     read -p "Shared Secret                  : " SHARED_SECRET
@@ -106,8 +136,9 @@ if [ "$SILENT" == "no" ]; then
     read -p "Route53 - Record Type          : " ROUTE53_RECORD_TYPE
     read -p "S3 - Region                    : " S3_REGION
     read -p "S3 - Bucket                    : " S3_BUCKET
-    read -p "S3 - Key                       : " S3_KEY
+    echo ""
 fi
+
 
 [ -z $STAGE ] && usage
 [ -z $DNS_HOSTNAME ] && usage
@@ -120,25 +151,41 @@ fi
 [ -z $ROUTE53_RECORD_TYPE ] && usage
 [ -z $S3_REGION ] && usage
 [ -z $S3_BUCKET ] && usage
-[ -z $S3_KEY ] && usage
+
+S3_KEY=server-$STAGE.config
 
 URL=https://$API_DOMAIN_NAME
 
 BASEDIR=$(dirname "$0")
+CONFIGDIR=$BASEDIR/../../config/
 
-cp $BASEDIR/server.config.template $BASEDIR/server-$STAGE.config
-replace-tokens $BASEDIR/server-$STAGE.config
+cp $CONFIGDIR/server.config.template $CONFIGDIR/server-$STAGE.config
+replace-tokens $CONFIGDIR/server-$STAGE.config
 
-cp $BASEDIR/serverless.config.yml.template $BASEDIR/serverless-$STAGE.config.yml
-replace-tokens $BASEDIR/serverless-$STAGE.config.yml
+cp $CONFIGDIR/serverless.config.yml.template $CONFIGDIR/serverless-$STAGE.config.yml
+replace-tokens $CONFIGDIR/serverless-$STAGE.config.yml
 
-cp $BASEDIR/client.config.template $BASEDIR/client-$STAGE.config
-replace-tokens $BASEDIR/client-$STAGE.config
+cp $CONFIGDIR/client.config.template $CONFIGDIR/client-$STAGE.config
+replace-tokens $CONFIGDIR/client-$STAGE.config
 
 echo ""
-echo "Successfully created config files"
-echo "- $BASEDIR/server-$STAGE.config"
-echo "- $BASEDIR/serverless-$STAGE.config.yml"
-echo "- $BASEDIR/client-$STAGE.config"
 echo ""
+echo "= Successfully created config files"
+echo "==============================================================================="
+echo ""
+echo "--> $CONFIGDIR/server-$STAGE.config"
+echo "--> $CONFIGDIR/serverless-$STAGE.config.yml"
+echo "--> $CONFIGDIR/client-$STAGE.config"
+echo ""
+echo ""
+echo ""
+echo ""
+echo "= IMPORTANT"
+echo "= Manual Steps"
+echo "==============================================================================="
+echo ""
+echo "--> Upload file '$CONFIGDIR/$S3_KEY' to S3 bucket '$S3_BUCKET' in '$S3_REGION'"
+echo ""
+echo ""
+
 exit 0
