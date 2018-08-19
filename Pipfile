@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+"boto3" = "*"
+
+[dev-packages]
+pylint = "*"
+wheel = "*"
+coverage = "*"
+codecov = "*"
+
+[requires]
+python_version = "3.7"

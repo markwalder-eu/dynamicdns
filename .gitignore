@@ -1,7 +1,6 @@
 node_modules
 __pycache__
 .serverless
-.dyndns-venv
 .vscode
 .coverage
 htmlcov

@@ -1,17 +1,13 @@
 language: python
 
-python: 3.6
+python: 3.7
 node_js: 0.10
 
 install:
-  - pip install pip-tools
-  - pip-sync requirements.txt requirements-dev.txt
-  - npm install -g serverless
-  - npm install
+  - make install
 
 script:
-  - coverage run --source dynamicdns --branch --omit "*/__init__.py" -m unittest discover;
-    codecov -t $CODECOV_TOKEN
+  - make codecov
 
 deploy:
   - provider: script

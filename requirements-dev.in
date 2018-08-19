@@ -1,6 +1,0 @@
-# requirements-dev.in
-pip-tools
-pylint
-wheel
-coverage
-codecov
