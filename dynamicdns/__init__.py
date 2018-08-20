@@ -1,4 +1,3 @@
-
-__author__          = "André Markwalder"
-__author_email__    = "andre.markwalder@gmail.com"
-__version__         = "0.1.0"
+__author__        = "André Markwalder"
+__author_email__  = "andre.markwalder@gmail.com"
+__version__       = "dev-c535a65"
