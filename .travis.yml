@@ -12,6 +12,6 @@ script:
 deploy:
   - provider: script
     skip_cleanup: true
-    script: ./dynamicdns/scripts/dynamic-dns-config --stage $DEV_STAGE --silent yes --hostname $DEV_DNS_HOSTNAME --shared-secret $DEV_SHARED_SECRET --api-domain-name $DEV_API_DOMAIN_NAME --api-domain-certificate-name $DEV_API_DOMAIN_CERTIFICATE_NAME --route53-region $DEV_ROUTE53_REGION --route53-zone-id $DEV_ROUTE53_ZONE_ID --route53-record-ttl $DEV_ROUTE53_RECORD_TTL --route53-record-type $DEV_ROUTE53_RECORD_TYPE --s3-region $DEV_S3_REGION --s3-bucket $DEV_S3_BUCKET --s3-key $DEV_S3_KEY; sls deploy --stage=$DEV_STAGE; ./dynamicdns/scripts/dynamic-dns-deploy --stage $DEV_STAGE
+    script: make deploy
     on:
       tags: true
