@@ -38,7 +38,7 @@ codecov: coverage
 ################################################################################
 # Release Targets
 
-dev-release: VERSION = $(shell git describe)
+dev-release: VERSION = dev-$(shell date +%Y%m%d-%H%M%S)
 dev-release: release
 
 release: $(OS)-guard-VERSION
