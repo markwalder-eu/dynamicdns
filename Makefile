@@ -42,7 +42,6 @@ dev-release: VERSION = dev-$(shell date +%Y%m%d-%H%M%S)
 dev-release: release
 
 release: $(OS)-guard-VERSION
-	@echo $(VERSION)
 	git tag -a "$(VERSION)" -m "Release $(VERSION)"
 	git push --tags
 .PHONY: release
@@ -120,6 +119,36 @@ deploy: $(OS)-guard-STAGE version config/serverless-$(STAGE).config.yml
 
 version:
 	@echo no = \"$(shell git describe)\" > dynamicdns/version.py
+
+set-vars-from-dev:
+	STAGE=$(DEV_STAGE)
+	DNS_HOSTNAME=$(DEV_DNS_HOSTNAME)
+	SHARED_SECRET=$(DEV_SHARED_SECRET)
+	API_DOMAIN_NAME=$(DEV_API_DOMAIN_NAME)
+	API_DOMAIN_CERTIFICATE_NAME=$(DEV_API_DOMAIN_CERTIFICATE_NAME)
+	ROUTE53_REGION=$(DEV_ROUTE53_REGION)
+	ROUTE53_ZONE_ID=$(DEV_ROUTE53_ZONE_ID)
+	ROUTE53_RECORD_TTL=$(DEV_ROUTE53_RECORD_TTL)
+	ROUTE53_RECORD_TYPE=$(DEV_ROUTE53_RECORD_TYPE)
+	S3_REGION=$(DEV_S3_REGION)
+	S3_BUCKET=$(DEV_S3_BUCKET)
+	S3_KEY=$(DEV_S3_KEY)
+.PHONY: set-vars-from-dev
+
+set-vars-from-prod:
+	STAGE=$(PROD_STAGE)
+	DNS_HOSTNAME=$(PROD_DNS_HOSTNAME)
+	SHARED_SECRET=$(PROD_SHARED_SECRET)
+	API_DOMAIN_NAME=$(PROD_API_DOMAIN_NAME)
+	API_DOMAIN_CERTIFICATE_NAME=$(PROD_API_DOMAIN_CERTIFICATE_NAME)
+	ROUTE53_REGION=$(PROD_ROUTE53_REGION)
+	ROUTE53_ZONE_ID=$(PROD_ROUTE53_ZONE_ID)
+	ROUTE53_RECORD_TTL=$(PROD_ROUTE53_RECORD_TTL)
+	ROUTE53_RECORD_TYPE=$(PROD_ROUTE53_RECORD_TYPE)
+	S3_REGION=$(PROD_S3_REGION)
+	S3_BUCKET=$(PROD_S3_BUCKET)
+	S3_KEY=$(PROD_S3_KEY)
+.PHONY: set-vars-from-prod
 
 ################################################################################
 
