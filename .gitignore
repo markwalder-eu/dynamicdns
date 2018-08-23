@@ -5,6 +5,4 @@ __pycache__
 .coverage
 htmlcov
 
-config/client-*.config
-config/server-*.config
-config/serverless-*.config.yml
+config
