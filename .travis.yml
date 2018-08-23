@@ -12,6 +12,6 @@ script:
 deploy:
   - provider: script
     skip_cleanup: true
-    script: make set-vars-from-dev; make deploy
+    script: make deploy-dev
     on:
       tags: true

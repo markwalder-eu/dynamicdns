@@ -113,14 +113,14 @@ run: config/client-$(STAGE).config $(OS)-guard-STAGE $(OS)-guard-URL
 ################################################################################
 # Deployment Targets
 
+version:
+	@echo no = \"$(shell git describe)\" > dynamicdns/version.py
+
 deploy: $(OS)-guard-STAGE version config/serverless-$(STAGE).config.yml
 	@serverless deploy --stage=$(STAGE)
 	@serverless create_domain --stage=$(STAGE)
 
-version:
-	@echo no = \"$(shell git describe)\" > dynamicdns/version.py
-
-set-vars-from-dev:
+deploy-dev:
 	export STAGE=$(DEV_STAGE)
 	export DNS_HOSTNAME=$(DEV_DNS_HOSTNAME)
 	export SHARED_SECRET=$(DEV_SHARED_SECRET)
@@ -133,9 +133,10 @@ set-vars-from-dev:
 	export S3_REGION=$(DEV_S3_REGION)
 	export S3_BUCKET=$(DEV_S3_BUCKET)
 	export S3_KEY=$(DEV_S3_KEY)
-.PHONY: set-vars-from-dev
+	$(MAKE) deploy
+.PHONY: deploy-dev
 
-set-vars-from-prod:
+deploy-prod:
 	export STAGE=$(PROD_STAGE)
 	export DNS_HOSTNAME=$(PROD_DNS_HOSTNAME)
 	export SHARED_SECRET=$(PROD_SHARED_SECRET)
@@ -148,7 +149,8 @@ set-vars-from-prod:
 	export S3_REGION=$(PROD_S3_REGION)
 	export S3_BUCKET=$(PROD_S3_BUCKET)
 	export S3_KEY=$(PROD_S3_KEY)
-.PHONY: set-vars-from-prod
+	$(MAKE) deploy
+.PHONY: deploy-prod
 
 ################################################################################
 
