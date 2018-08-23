@@ -23,16 +23,16 @@ install:
 .PHONY: install
 
 test:
-	python -m unittest discover
+	pipenv run python -m unittest discover
 .PHONY: test
 
 coverage:
-	coverage run --source dynamicdns --branch --omit "*/__init__.py" -m unittest discover
-	coverage report
+	pipenv run coverage run --source dynamicdns --branch --omit "*/__init__.py" -m unittest discover
+	pipenv run coverage report
 .PHONY: coverage
 
 codecov: coverage
-	codecov -t $(CODECOV_TOKEN)
+	pipenv run codecov -t $(CODECOV_TOKEN)
 .PHONY: codecov
 
 ################################################################################
