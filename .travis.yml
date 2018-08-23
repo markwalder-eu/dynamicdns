@@ -12,6 +12,20 @@ script:
 deploy:
   - provider: script
     skip_cleanup: true
-    script: make deploy
+    script: \ 
+      STAGE=$DEV_STAGE \
+      DNS_HOSTNAME=$DEV_DNS_HOSTNAME \
+      SHARED_SECRET=$DEV_SHARED_SECRET \
+      API_DOMAIN_NAME=$DEV_API_DOMAIN_NAME \
+      API_DOMAIN_CERTIFICATE_NAME=$DEV_API_DOMAIN_CERTIFICATE_NAME \
+      ROUTE53_REGION=$DEV_ROUTE53_REGION \
+      ROUTE53_ZONE_ID=$DEV_ROUTE53_ZONE_ID \
+      ROUTE53_RECORD_TTL=$DEV_ROUTE53_RECORD_TTL \
+      ROUTE53_RECORD_TYPE=$DEV_ROUTE53_RECORD_TYPE \
+      S3_REGION=$DEV_S3_REGION \
+      S3_BUCKET=$DEV_S3_BUCKET \
+      S3_KEY=$DEV_S3_KEY \
+      \
+      make deploy
     on:
       tags: true
