@@ -116,7 +116,10 @@ run: config/client-$(STAGE).config $(OS)-guard-STAGE $(OS)-guard-URL
 version:
 	@echo no = \"$(shell git describe)\" > dynamicdns/version.py
 
-deploy: $(OS)-guard-STAGE version config/serverless-$(STAGE).config.yml
+config:
+	mkdir -p config
+
+deploy: $(OS)-guard-STAGE version config config/serverless-$(STAGE).config.yml
 	@serverless deploy --stage=$(STAGE)
 	@serverless create_domain --stage=$(STAGE)
 
