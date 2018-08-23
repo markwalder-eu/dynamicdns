@@ -50,6 +50,11 @@ release: $(OS)-guard-VERSION
 ################################################################################
 # Configuration Targets
 
+clean-config: $(OS)-guard-STAGE
+	@rm -rf config/client-$(STAGE).config
+	@rm -rf config/server-$(STAGE).config
+	@rm -rf config/serverless-$(STAGE).config.yml
+
 config/client-$(STAGE).config:
 	@test -n "$(URL)" # $$URL
 	@test -n "$(DNS_HOSTNAME)" # $$DNS_HOSTNAME
@@ -115,11 +120,6 @@ deploy: $(OS)-guard-STAGE version config/serverless-$(STAGE).config.yml
 
 version:
 	@echo no = \"$(shell git describe)\" > dynamicdns/version.py
-
-clean: $(OS)-guard-STAGE
-	@rm -rf config/client-$(STAGE).config
-	@rm -rf config/server-$(STAGE).config
-	@rm -rf config/serverless-$(STAGE).config.yml
 
 ################################################################################
 
