@@ -17,11 +17,11 @@ The Dynamic DNS Utility is mainly composed of two components:
 * Client: Running locally in your home, scheduled to update the IP address in periodic intervalls   
 * Server: Located in the cloud to update the home IP address on the cloud providers DNS service and serves as an access point for the client 
 
-Security is implemented by using a shared secret known by the client and server, but is not transmitted over the wire. The client creates a hash over the parameters and sends this hash over the wire. The server does the same and compares the generated hash with the one transmitted over the wire. If both hashes are the same, the update is allowed. In addition the source IP address is part of the hash and therefore an additional security step is included in the update algorithm.
+Security is implemented by using a shared secret known by the client and server, but is not transmitted over the wire. The client creates a hash over the parameters and sends this hash over the wire. The server does the same and compares the generated hash with the one transmitted over the wire. If both hashes are the same, the update is allowed. In addition the source IP address is part of the hash and therefore an additional security step is included in the update algorithm to compare the source IP address as well.
 
-The client component is a shell script which can be scheduled locally to e.g. update the IP address every 5 minutes. The shell script can be downloaded from the server and executed. Therefore it is not required to install anything locally (except the required software components like curl, tail, head, ...). The configuration file can be omitted, but if you pass sensitive data like the shared secret in e.g. a cron job this sensitive data will be logged on the executing machine which could be a security breach if someone is able to access the logfiles. 
+The client component is a shell script which can be scheduled locally to e.g. update the IP address all 5 minutes. The shell script can be downloaded from the server and executed. Therefore it is not required to install anything locally (except the required software components like curl, tail, head, ...). The configuration file can be omitted, but if you pass sensitive data like the shared secret in e.g. a cron job this sensitive data will be logged on the executing machine which could be a security breach if someone is able to access the logfiles. 
 
-The server component is a lambda function which has been implemented with Python and Serverless. Configuration files are located in the cloud e.g. in the case of AWS in is located in a S3 bucket.
+The server component is a lambda function which has been implemented with Python and Serverless. Configuration files are located in the cloud e.g. in case of AWS, the configuration file is located in a S3 bucket.
 
 Currently only Amazon Web Services (AWS) is supported, but the architecture of the tool allows to support additional cloud providers like Azure, GCloud and any other which are supoorted by the Serverless framework.
 
@@ -36,13 +36,13 @@ Currently only Amazon Web Services (AWS) is supported, but the architecture of t
 
 ## AWS Setup
 
-* Create on AWS Route 53 a new hosted zone (if you don't already have one you want to reuse [AWS Console - Route 53](https://console.aws.amazon.com/route53/home)
+* Create on AWS Route 53 a new hosted zone (if you don't already have one you want to reuse) - [AWS Console - Route 53](https://console.aws.amazon.com/route53/home)
 > Note: Remember the zone id of the created (or existing) Route 53 hosted zone for later use
 
-* Create on AWS a new S3 Bucket (if you don't already have one you want to reuse) [AWS Console - S3](https://console.aws.amazon.com/s3/home)
+* Create on AWS a new S3 Bucket (if you don't already have one you want to reuse) - [AWS Console - S3](https://console.aws.amazon.com/s3/home)
 > Note: Remember the S3 bucket name of the created (or existing) S3 bucket for later use 
 
-* Create on AWS a new certificate in certificate manager (if you don't already have one you want to reuse) [AWS Console - Certificate Manager](https://console.aws.amazon.com/acm/home)
+* Create on AWS a new certificate in certificate manager (if you don't already have one you want to reuse) - [AWS Console - Certificate Manager](https://console.aws.amazon.com/acm/home)
 > Note: Remember the certificate name of the created (or existing) certificate for later use
 
 
