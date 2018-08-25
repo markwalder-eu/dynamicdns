@@ -114,7 +114,7 @@ run: config/client-$(STAGE).config $(OS)-guard-STAGE $(OS)-guard-URL
 # Deployment Targets
 
 version:
-	@echo $(shell git describe) > dynamicdns/version
+	@echo -n $(shell git describe) > dynamicdns/version
 
 config:
 	mkdir -p config
