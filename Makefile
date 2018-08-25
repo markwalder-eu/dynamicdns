@@ -36,6 +36,10 @@ dev-release: VERSION = dev-$(shell date +%Y%m%d-%H%M%S)
 dev-release: release
 
 release: guard-VERSION
+	@echo -n $(VERSION) > dynamicdns/version
+	git add dynamicdns/version
+	git commit -m "Release $(VERSION)"
+	git push
 	git tag -a "$(VERSION)" -m "Release $(VERSION)"
 	git push --tags
 .PHONY: release
@@ -125,13 +129,10 @@ run: config/client-$(STAGE).config guard-STAGE guard-URL
 ################################################################################
 # Deployment Targets
 
-version:
-	@echo -n $(shell git describe) > dynamicdns/version
-
 config:
 	mkdir -p config
 
-deploy: guard-STAGE version config config/serverless-$(STAGE).config.yml
+deploy: guard-STAGE config config/serverless-$(STAGE).config.yml
 	@serverless deploy --stage=$(STAGE)
 	@serverless create_domain --stage=$(STAGE)
 
