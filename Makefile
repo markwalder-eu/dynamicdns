@@ -124,7 +124,7 @@ deploy: $(OS)-guard-STAGE version config config/serverless-$(STAGE).config.yml
 	@serverless create_domain --stage=$(STAGE)
 
 deploy-dev:
-	$(eval export STAGE=$(DEV_STAGE))
+	$(eval export STAGE=dev
 	$(eval export DNS_HOSTNAME=$(DEV_DNS_HOSTNAME))
 	$(eval export SHARED_SECRET=$(DEV_SHARED_SECRET))
 	$(eval export API_DOMAIN_NAME=$(DEV_API_DOMAIN_NAME))
@@ -139,21 +139,21 @@ deploy-dev:
 	$(MAKE) deploy
 .PHONY: deploy-dev
 
-deploy-prod:
-	$(eval export STAGE=$(PROD_STAGE))
-	$(eval export DNS_HOSTNAME=$(PROD_DNS_HOSTNAME))
-	$(eval export SHARED_SECRET=$(PROD_SHARED_SECRET))
-	$(eval export API_DOMAIN_NAME=$(PROD_API_DOMAIN_NAME))
-	$(eval export API_DOMAIN_CERTIFICATE_NAME=$(PROD_API_DOMAIN_CERTIFICATE_NAME))
-	$(eval export ROUTE53_REGION=$(PROD_ROUTE53_REGION))
-	$(eval export ROUTE53_ZONE_ID=$(PROD_ROUTE53_ZONE_ID))
-	$(eval export ROUTE53_RECORD_TTL=$(PROD_ROUTE53_RECORD_TTL))
-	$(eval export ROUTE53_RECORD_TYPE=$(PROD_ROUTE53_RECORD_TYPE))
-	$(eval export S3_REGION=$(PROD_S3_REGION))
-	$(eval export S3_BUCKET=$(PROD_S3_BUCKET))
-	$(eval export S3_KEY=$(PROD_S3_KEY))
+deploy-prd:
+	$(eval export STAGE=prd
+	$(eval export DNS_HOSTNAME=$(PRD_DNS_HOSTNAME))
+	$(eval export SHARED_SECRET=$(PRD_SHARED_SECRET))
+	$(eval export API_DOMAIN_NAME=$(PRD_API_DOMAIN_NAME))
+	$(eval export API_DOMAIN_CERTIFICATE_NAME=$(PRD_API_DOMAIN_CERTIFICATE_NAME))
+	$(eval export ROUTE53_REGION=$(PRD_ROUTE53_REGION))
+	$(eval export ROUTE53_ZONE_ID=$(PRD_ROUTE53_ZONE_ID))
+	$(eval export ROUTE53_RECORD_TTL=$(PRD_ROUTE53_RECORD_TTL))
+	$(eval export ROUTE53_RECORD_TYPE=$(PRD_ROUTE53_RECORD_TYPE))
+	$(eval export S3_REGION=$(PRD_S3_REGION))
+	$(eval export S3_BUCKET=$(PRD_S3_BUCKET))
+	$(eval export S3_KEY=$(PRD_S3_KEY))
 	$(MAKE) deploy
-.PHONY: deploy-prod
+.PHONY: deploy-prd
 
 ################################################################################
 
