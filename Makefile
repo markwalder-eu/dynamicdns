@@ -5,12 +5,6 @@ UNAME := $(shell uname)
 
 SHELL := /bin/bash 
 
-ifeq ($(UNAME), Linux)
-OS = linux
-else
-OS = windows
-endif
-
 ################################################################################
 # Development Targets
 
@@ -41,7 +35,7 @@ codecov: coverage
 dev-release: VERSION = dev-$(shell date +%Y%m%d-%H%M%S)
 dev-release: release
 
-release: $(OS)-guard-VERSION
+release: guard-VERSION
 	git tag -a "$(VERSION)" -m "Release $(VERSION)"
 	git push --tags
 .PHONY: release
@@ -49,12 +43,30 @@ release: $(OS)-guard-VERSION
 ################################################################################
 # Configuration Targets
 
-clean-config: $(OS)-guard-STAGE
+clean-config: guard-STAGE
 	@rm -rf config/client-$(STAGE).config
 	@rm -rf config/server-$(STAGE).config
 	@rm -rf config/serverless-$(STAGE).config.yml
+.PHONY: clean-config
 
-config/client-$(STAGE).config:
+create-config: config \
+	guard-STAGE \
+	guard-URL \
+	guard-DNS_HOSTNAME \
+	guard-SHARED_SECRET \
+
+	S3_REGION
+	ROUTE53_ZONE_ID
+	@test -n "$(ROUTE53_RECORD_TTL)" # $$ROUTE53_RECORD_TTL
+	@test -n "$(ROUTE53_RECORD_TYPE)" # $$ROUTE53_RECORD_TYPE
+	@test -n "$(SHARED_SECRET)
+
+	config/client-$(STAGE).config \
+	config/server-$(STAGE).config \
+	config/serverless-$(STAGE).config.yml
+.PHONY: create-config
+
+config/client-$(STAGE).config: guard-STAGE
 	@test -n "$(URL)" # $$URL
 	@test -n "$(DNS_HOSTNAME)" # $$DNS_HOSTNAME
 	@test -n "$(SHARED_SECRET)" # $$SHARED_SECRET
@@ -71,10 +83,9 @@ config/client-$(STAGE).config:
 	@echo \# e.g. sharedsecret=ZDhszNKMbmuFYBhZgAuzoQFbmcqM6CYb>> $@
 	@echo sharedsecret=$(SHARED_SECRET)>> $@
 
-config/server-$(STAGE).config: 
-	@test -n "$(STAGE)" # $$STAGE
+config/server-$(STAGE).config: guard-STAGE
 	@test -n "$(DNS_HOSTNAME)" # $$DNS_HOSTNAME
-	@test -n "$(S3_REGION)" # $$S3_REGION
+	@test -n "$(ROUTE53_REGION)" # $$ROUTE53_REGION
 	@test -n "$(ROUTE53_ZONE_ID)" # $$ROUTE53_ZONE_ID
 	@test -n "$(ROUTE53_RECORD_TTL)" # $$ROUTE53_RECORD_TTL
 	@test -n "$(ROUTE53_RECORD_TYPE)" # $$ROUTE53_RECORD_TYPE
@@ -82,7 +93,7 @@ config/server-$(STAGE).config:
 
 	@echo "{"> $@
 	@echo "	\"$(DNS_HOSTNAME)\": {">> $@
-	@echo "		\"aws_region\": \"$(S3_REGION)\",">> $@
+	@echo "		\"route_53_region\": \"$(ROUTE53_REGION)\",">> $@
 	@echo "		\"route_53_zone_id\": \"$(ROUTE53_ZONE_ID)\",">> $@
 	@echo "		\"route_53_record_ttl\": $(ROUTE53_RECORD_TTL),">> $@
 	@echo "		\"route_53_record_type\": \"$(ROUTE53_RECORD_TYPE)\",">> $@
@@ -90,8 +101,7 @@ config/server-$(STAGE).config:
 	@echo "	}">> $@
 	@echo "}">> $@
 
-config/serverless-$(STAGE).config.yml:
-	@test -n "$(STAGE)" # $$STAGE
+config/serverless-$(STAGE).config.yml: guard-STAGE
 	@test -n "$(API_DOMAIN_NAME)" # $$API_DOMAIN_NAME
 	@test -n "$(S3_REGION)" # $$S3_REGION
 	@test -n "$(S3_BUCKET)" # $$S3_BUCKET
@@ -107,7 +117,7 @@ config/serverless-$(STAGE).config.yml:
 ################################################################################
 # Client Targets
 
-run: config/client-$(STAGE).config $(OS)-guard-STAGE $(OS)-guard-URL
+run: config/client-$(STAGE).config guard-STAGE guard-URL
 	@bash <(curl -sSL https://$(URL)/dynamicdns-v1/script) -c config/client-$(STAGE).config
 
 ################################################################################
@@ -119,7 +129,7 @@ version:
 config:
 	mkdir -p config
 
-deploy: $(OS)-guard-STAGE version config config/serverless-$(STAGE).config.yml
+deploy: guard-STAGE version config config/serverless-$(STAGE).config.yml
 	@serverless deploy --stage=$(STAGE)
 	@serverless create_domain --stage=$(STAGE)
 
@@ -157,16 +167,10 @@ deploy-prd:
 
 ################################################################################
 
-linux-guard-%:
+guard-%:
 	@ if [ "${${*}}" = "" ]; then \
 		echo "Environment variable $* not set"; \
 		exit 1; \
 	fi
 
-windows-guard-%:
-	@ if "$(${*})" == "" ( \
-		echo Environment variable $* not set & \
-		exit 1 \
-	) 
-	
 ################################################################################

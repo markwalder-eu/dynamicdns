@@ -34,8 +34,8 @@ class S3ConfigProvider(ConfigProvider):
         except Exception as ex:
             return Error("Could not read configuration. Excpeption: " + str(ex))
         
-    def aws_region(self, hostname: str):
-        return self.__checkAndReturn(hostname, 'aws_region')
+    def route_53_region(self, hostname: str):
+        return self.__checkAndReturn(hostname, 'route_53_region')
 
     def route_53_zone_id(self, hostname: str):
         return self.__checkAndReturn(hostname, 'route_53_zone_id')

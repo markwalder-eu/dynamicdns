@@ -141,7 +141,7 @@ class TestRoute53Provider(unittest.TestCase):
             boto3_wrapper.client_change_resource_record_sets = MagicMock(return_value=None)
 
         config: S3ConfigProvider = s3config.factory(None)
-        config.aws_region = MagicMock(return_value='aws_region')
+        config.route_53_region = MagicMock(return_value='route_53_region')
         config.route_53_record_ttl = MagicMock(return_value='route_53_record_ttl')
         config.route_53_record_type = MagicMock(return_value='route_53_record_type')
         config.route_53_zone_id = MagicMock(return_value='route_53_zone_id')

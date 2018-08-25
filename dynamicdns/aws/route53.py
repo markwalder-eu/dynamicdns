@@ -18,7 +18,7 @@ class Route53Provider(DNSProvider):
     def read(self, hostname: str):
         try:
             recordset = self.boto3_wrapper.client_list_resource_record_sets(
-                region = self.config.aws_region(hostname),
+                region = self.config.route_53_region(hostname),
                 hosted_zone_id = self.config.route_53_zone_id(hostname), 
                 start_record_name = hostname, 
                 start_record_type = self.config.route_53_record_type(hostname), 
@@ -37,7 +37,7 @@ class Route53Provider(DNSProvider):
     def update(self, hostname: str, updateip: str):
         try:
             self.boto3_wrapper.client_change_resource_record_sets(
-                region = self.config.aws_region(hostname),
+                region = self.config.route_53_region(hostname),
                 hosted_zone_id = self.config.route_53_zone_id(hostname),
                 change_batch = {
                     'Changes': [

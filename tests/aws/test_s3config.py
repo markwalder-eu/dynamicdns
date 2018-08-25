@@ -17,7 +17,7 @@ class TestS3ConfigProvider(unittest.TestCase):
     def testReadProps(self):
         config: S3ConfigProvider = self.__createConfigProvider(
         {   "hostname": {
-                "aws_region": "region",
+                "route_53_region": "region",
                 "route_53_zone_id": "zone-id",
                 "route_53_record_ttl": 42,
                 "route_53_record_type": "record-type",
@@ -34,7 +34,7 @@ class TestS3ConfigProvider(unittest.TestCase):
 
             self.assertFalse(isinstance(result, Error))
 
-            self.assertEqual(config.aws_region('hostname'), 'region')
+            self.assertEqual(config.route_53_region('hostname'), 'region')
             self.assertEqual(config.route_53_zone_id('hostname'), 'zone-id')
             self.assertEqual(config.route_53_record_ttl('hostname'), 42)
             self.assertEqual(config.route_53_record_type('hostname'), 'record-type')
@@ -44,7 +44,7 @@ class TestS3ConfigProvider(unittest.TestCase):
     def testMissingHostname(self):
         config: S3ConfigProvider = self.__createConfigProvider(
         {   "hostname": {
-                "aws_region": "region",
+                "route_53_region": "region",
                 "route_53_zone_id": "zone-id",
                 "route_53_record_ttl": 42,
                 "route_53_record_type": "record-type",
@@ -61,7 +61,7 @@ class TestS3ConfigProvider(unittest.TestCase):
 
             self.assertFalse(isinstance(result, Error))
             with self.assertRaises(Exception):
-                config.aws_region('hostname-not-in-config')
+                config.route_53_region('hostname-not-in-config')
 
 
     def testMissingAttribute(self):
@@ -83,7 +83,7 @@ class TestS3ConfigProvider(unittest.TestCase):
 
             self.assertFalse(isinstance(result, Error))
             with self.assertRaises(Exception):
-                config.aws_region('hostname')
+                config.route_53_region('hostname')
 
 
     def testReadException(self):
