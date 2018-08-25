@@ -124,7 +124,7 @@ deploy: $(OS)-guard-STAGE version config config/serverless-$(STAGE).config.yml
 	@serverless create_domain --stage=$(STAGE)
 
 deploy-dev:
-	$(eval export STAGE=dev
+	$(eval export STAGE=dev)
 	$(eval export DNS_HOSTNAME=$(DEV_DNS_HOSTNAME))
 	$(eval export SHARED_SECRET=$(DEV_SHARED_SECRET))
 	$(eval export API_DOMAIN_NAME=$(DEV_API_DOMAIN_NAME))
@@ -140,7 +140,7 @@ deploy-dev:
 .PHONY: deploy-dev
 
 deploy-prd:
-	$(eval export STAGE=prd
+	$(eval export STAGE=prd)
 	$(eval export DNS_HOSTNAME=$(PRD_DNS_HOSTNAME))
 	$(eval export SHARED_SECRET=$(PRD_SHARED_SECRET))
 	$(eval export API_DOMAIN_NAME=$(PRD_API_DOMAIN_NAME))
