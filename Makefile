@@ -53,20 +53,22 @@ create-config: config \
 	guard-STAGE \
 	guard-URL \
 	guard-DNS_HOSTNAME \
+	guard-API_DOMAIN_NAME \
+	guard-API_DOMAIN_CERTIFICATE_NAME \
+	guard-ROUTE53_REGION \
+	guard-ROUTE53_ZONE_ID \
+	guard-ROUTE53_RECORD_TTL \
+	guard-ROUTE53_RECORD_TYPE \
 	guard-SHARED_SECRET \
-
-	S3_REGION
-	ROUTE53_ZONE_ID
-	@test -n "$(ROUTE53_RECORD_TTL)" # $$ROUTE53_RECORD_TTL
-	@test -n "$(ROUTE53_RECORD_TYPE)" # $$ROUTE53_RECORD_TYPE
-	@test -n "$(SHARED_SECRET)
-
+	guard-S3_REGION \
+	guard-S3_BUCKET \
+	guard-S3_KEY \
 	config/client-$(STAGE).config \
 	config/server-$(STAGE).config \
 	config/serverless-$(STAGE).config.yml
 .PHONY: create-config
 
-config/client-$(STAGE).config: guard-STAGE
+config/client-%.config:
 	@test -n "$(URL)" # $$URL
 	@test -n "$(DNS_HOSTNAME)" # $$DNS_HOSTNAME
 	@test -n "$(SHARED_SECRET)" # $$SHARED_SECRET
@@ -83,7 +85,7 @@ config/client-$(STAGE).config: guard-STAGE
 	@echo \# e.g. sharedsecret=ZDhszNKMbmuFYBhZgAuzoQFbmcqM6CYb>> $@
 	@echo sharedsecret=$(SHARED_SECRET)>> $@
 
-config/server-$(STAGE).config: guard-STAGE
+config/server-%.config:
 	@test -n "$(DNS_HOSTNAME)" # $$DNS_HOSTNAME
 	@test -n "$(ROUTE53_REGION)" # $$ROUTE53_REGION
 	@test -n "$(ROUTE53_ZONE_ID)" # $$ROUTE53_ZONE_ID
@@ -101,7 +103,7 @@ config/server-$(STAGE).config: guard-STAGE
 	@echo "	}">> $@
 	@echo "}">> $@
 
-config/serverless-$(STAGE).config.yml: guard-STAGE
+config/serverless-%.config.yml: 
 	@test -n "$(API_DOMAIN_NAME)" # $$API_DOMAIN_NAME
 	@test -n "$(S3_REGION)" # $$S3_REGION
 	@test -n "$(S3_BUCKET)" # $$S3_BUCKET
@@ -118,7 +120,7 @@ config/serverless-$(STAGE).config.yml: guard-STAGE
 # Client Targets
 
 run: config/client-$(STAGE).config guard-STAGE guard-URL
-	@bash <(curl -sSL https://$(URL)/dynamicdns-v1/script) -c config/client-$(STAGE).config
+	@bash <(curl -sSL $(URL)/dynamicdns-v1/script) -c config/client-$(STAGE).config
 
 ################################################################################
 # Deployment Targets
