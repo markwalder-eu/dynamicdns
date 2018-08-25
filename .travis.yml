@@ -15,10 +15,10 @@ deploy:
     script: make deploy-dev
     on:
       tags: true
-      condition: $TRAVIS_TAG =~ !(^v[0-9]+\.[0-9]+\.[0-9]+)
+      condition: $TRAVIS_TAG =~ ^dev\-[0-9]{8}\-[0-9]{6}$
   - provider: script
     skip_cleanup: true
     script: make deploy-prod
     on:
       tags: true
-      condition: $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+
+      condition: $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$
