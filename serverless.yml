@@ -53,9 +53,6 @@ functions:
       - http:
           path: script
           method: get
-      - http:
-          path: info
-          method: get
 
 plugins:
   - serverless-python-requirements
