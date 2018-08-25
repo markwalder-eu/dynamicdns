@@ -30,8 +30,11 @@ Currently only Amazon Web Services (AWS) is supported, but the architecture of t
 
 ## Prerequisites 
 
-* Install the serverless framework including the AWS credentials setup. For installation details see [Serverless - Quickstart](https://serverless.com/framework/docs/providers/aws/guide/quick-start/)
+* Install `git` to clone the repository to local machine e.g. on Ubuntu run `sudo apt-get install git`
+
 * Install `make` to easily create the configuration files and deploy the lambda function with serverless e.g. on Ubuntu run `sudo apt-get install make`
+
+* Install `python` and `pip` to deploy to the cloud via Serverless e.g. on Ubuntu run `sudo apt-get install python3 python3-pip`
 
 
 ## Checkout Source
@@ -41,6 +44,16 @@ Currently only Amazon Web Services (AWS) is supported, but the architecture of t
 git clone https://github.com/amarkwalder/dynamicdns.git
 git checkout -b v1.0.0
 ```
+
+## Prepare Python and Node environment
+
+* Change to the source directory and install dependencies
+```
+cd dynamicdns
+make install
+```
+
+* The above command installs Serverless framework automatically. To use Serverless you need to configure it with cloud credentials. For installation details see [Serverless - Quickstart](https://serverless.com/framework/docs/providers/aws/guide/quick-start/).
 
 
 ## AWS Setup
