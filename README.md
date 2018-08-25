@@ -34,6 +34,15 @@ Currently only Amazon Web Services (AWS) is supported, but the architecture of t
 * Install `make` to easily create the configuration files and deploy the lambda function with serverless e.g. on Ubuntu run `sudo apt-get install make`
 
 
+## Checkout Source
+
+* Clone the repo and checkout the version you intend to use
+```
+git clone https://github.com/amarkwalder/dynamicdns.git
+git checkout -b v1.0.0
+```
+
+
 ## AWS Setup
 
 * Create on AWS Route 53 a new hosted zone (if you don't already have one you want to reuse) - [AWS Console - Route 53](https://console.aws.amazon.com/route53/home)
