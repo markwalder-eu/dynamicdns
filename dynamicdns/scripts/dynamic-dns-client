@@ -70,10 +70,10 @@ echo "$(date) - Dynamic DNS Update Utility"
 
 response=$(curl -w \\n%{http_code} -s -q "$url/$myip_url?raw")
 
-http_status=$(echo "$response" | tail -n1)
-tmp=$(echo "$response" | head -n-1)
-fn_status=$(echo "$tmp" | head -n1)
-fn_message=$(echo "$tmp" | tail -n1)
+http_status=$(echo "$response" | tail -n 1)
+tmp=$(echo "$response" | head -n 2)
+fn_status=$(echo "$tmp" | head -n 1)
+fn_message=$(echo "$tmp" | tail -n 1)
 
 if [ $http_status != 200 ] || [ "$fn_status" != "SUCCESS" ]; then
     echo "- Get My IP: FAILED  <-- $fn_message"
@@ -90,10 +90,10 @@ hash=$(echo -n $myip$hostname$sharedsecret | shasum -a 256 | awk '{print $1}')
 
 response=$(curl -w \\n%{http_code} -X POST -s -q "$url/$dns_url?raw&hostname=$hostname&${internalip}hash=$hash")
 
-http_status=$(echo "$response" | tail -n1)
-tmp=$(echo "$response" | head -n-1)
-fn_status=$(echo "$tmp" | head -n1)
-fn_message=$(echo "$tmp" | tail -n1)
+http_status=$(echo "$response" | tail -n 1)
+tmp=$(echo "$response" | head -n 2)
+fn_status=$(echo "$tmp" | head -n 1)
+fn_message=$(echo "$tmp" | tail -n 1)
 
 if [ $http_status != 200 ] || [ "$fn_status" != "SUCCESS" ]; then
     echo "- Update DNS Server: FAILED  <-- $fn_message"
