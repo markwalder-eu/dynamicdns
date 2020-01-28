@@ -22,7 +22,7 @@ package:
     
 provider:
   name: aws
-  runtime: python3.6
+  runtime: python3.7
   stage: ${self:custom.stage}
   environment:
     CONFIG_S3_REGION: ${self:custom.config.s3Region}
@@ -57,4 +57,3 @@ functions:
 plugins:
   - serverless-python-requirements
   - serverless-domain-manager
-  - serverless-aws-alias

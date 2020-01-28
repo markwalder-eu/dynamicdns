@@ -9,7 +9,7 @@ SHELL := /bin/bash
 # Development Targets
 
 install:
-	pip install pipenv
+	pip3 install pipenv
 	pipenv install
 	pipenv install --dev
 	npm install -g serverless
